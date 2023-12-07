@@ -1,0 +1,104 @@
+- name: create files directory
+  become: false
+  run_once: true
+  delegate_to: localhost
+  file:
+    path: "{{ role_path }}/files/{{ nox_version }}"
+    state: directory
+
+- name: download nox to localhost
+  become: false
+  run_once: true
+  delegate_to: localhost
+  get_url:
+    url: "{{ _bin_url }}"
+    dest: "{{ role_path }}/files/{{ nox_version }}/{{ _bin }}"
+    # checksum: "sha256:{{ _checksums }}"
+  register: _download_bin
+  until: _download_bin is succeeded
+  retries: 5
+  delay: 2
+
+- name: create nox system group
+  group:
+    name: "{{ nox_group }}"
+    system: true
+    state: present
+
+- name: create nox system user
+  user:
+    name: "{{ nox_user }}"
+    system: true
+    shell: "/sbin/nologin"
+    group: "{{ nox_group }}"
+    create_home: false
+    state: present
+
+- name: create nox directories
+  file:
+    path: "{{ nox_dir }}/nox-{{ instance }}/state"
+    state: directory
+    owner: "{{ dir.group | default('nox') }}"
+    group: "{{ dir.group | default('nox') }}"
+    mode: 0755
+  loop: "{{ nox_instances }}"
+  loop_control:
+    loop_var: instance
+    label: "nox-{{ instance }}"
+
+- name: propagate nox binary
+  copy:
+    src: "{{ role_path }}/files/{{ nox_version }}/{{ _bin }}"
+    dest: "{{ nox_dir }}/nox-{{ instance }}/nox"
+    owner: "{{ dir.group | default('nox') }}"
+    group: "{{ dir.group | default('nox') }}"
+    mode: 0555
+  loop: "{{ nox_instances }}"
+  loop_control:
+    loop_var: instance
+    label: "nox-{{ instance }}"
+  notify: restart nox
+  register: _binary
+
+- name: copy nox config
+  tags: config
+  copy:
+    src: "{{ nox_project_dir }}/configs/nox-{{ instance }}_Config.toml"
+    dest: "{{ nox_dir }}/nox-{{ instance }}/Config.toml"
+    owner: "{{ nox_user }}"
+    group: "{{ nox_group }}"
+    mode: 0640
+  loop: "{{ nox_instances }}"
+  loop_control:
+    loop_var: instance
+    label: "nox-{{ instance }}"
+  notify: restart nox
+  register: _config
+
+- name: create nox unit file
+  tags: config
+  copy:
+    content: "{{ nox_unit_file }}"
+    dest: "/etc/systemd/system/nox-@.service"
+    owner: root
+    group: root
+    mode: 0755
+  register: _systemd
+
+- name: enable noxes
+  systemd:
+    name: nox-@{{ instance }}
+    enabled: true
+    daemon_reload: true
+  loop: "{{ nox_instances }}"
+  loop_control:
+    loop_var: instance
+    label: "nox-{{ instance }}"
+
+- name: determine which instances to restart
+  vars:
+    _binary_changed: "{{ _binary.results | selectattr('changed', 'equalto', true) | map(attribute='instance') | list }}"
+    _config_changed: "{{ _config.results | selectattr('changed', 'equalto', true) | map(attribute='instance') | list }}"
+    _instances_changed: "{{ (_systemd is changed) | ternary(nox_instances, _binary_changed + _config_changed) }}"
+  set_fact:
+    _instances_to_restart: "{{ (nox_instances | select('in', _instances_changed) | list) | unique }}"

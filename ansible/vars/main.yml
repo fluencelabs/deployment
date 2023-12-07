@@ -1,0 +1,11 @@
+_arch_map:
+  amd64: amd64
+  x86_64: amd64
+  aarch64: arm64
+  64-bit: amd64
+_version: "{{ nox_version | regex_replace('^(?!v)', 'v') }}"
+_arch: "{{ _arch_map[ansible_architecture] }}"
+_download_url: "https://github.com/fluencelabs/nox/releases/download"
+_checksums: "{{ lookup('url', _download_url + '/nox-{{ _version }}/nox_SHA256_SUMS', wantlist=True) | list }}"
+_bin: "nox-{{ _arch }}"
+_bin_url: "{{ _download_url }}/nox-{{ _version }}/{{ _bin }}"

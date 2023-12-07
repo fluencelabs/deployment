@@ -1,0 +1,19 @@
+galaxy_info:
+  namespace: fluencelabs
+  role_name: nox
+  author: Anatolios Laskaris
+  description: Install and setup Nox - rust implementation of the Fluence network peer
+  issue_tracker_url: https://github.com/fluencelabs/deployments
+  min_ansible_version: 2.12
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+
+  galaxy_tags:
+    - p2p
+    - fluence
+
+dependencies: []

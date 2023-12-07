@@ -1,0 +1,92 @@
+- name: check "base_docker_config" variable
+  tags: always
+  assert:
+    that:
+      - base_docker_config is mapping
+      - base_docker_config | length
+    quiet: true
+  when: base_docker_config is defined
+
+- name: check "base_dnsmasq_config" variable
+  tags: always
+  assert:
+    that:
+      - base_dnsmasq_config is defined
+      - base_dnsmasq_config is string
+      - base_dnsmasq_config | length
+    quiet: true
+
+- name: check "base_openresolv_config" variable
+  tags: always
+  assert:
+    that:
+      - base_openresolv_config is defined
+      - base_openresolv_config is string
+      - base_openresolv_config | length
+    quiet: true
+
+- name: check "base_groups" variable
+  tags: always
+  assert:
+    that:
+      - base_groups is iterable
+      - base_groups is not string
+    quiet: true
+  when: base_groups is defined
+
+- name: check "base_users" variable
+  tags: always
+  assert:
+    that:
+      - base_users is iterable
+      - base_users is not string
+      - base_users is defined
+    quiet: true
+
+- name: check "base_packages" variable
+  tags: always
+  assert:
+    that:
+      - base_packages is iterable
+      - base_packages is not string
+      - base_packages | length
+    quiet: true
+  when: base_packages is defined
+
+- name: check "base_sysctl" variable
+  tags: always
+  assert:
+    that:
+      - base_sysctl is iterable
+      - base_sysctl is not string
+      - base_sysctl | length
+    quiet: true
+  when: base_sysctl is defined
+
+- name: check "base_limits" variable
+  tags: always
+  assert:
+    that:
+      - base_limits is iterable
+      - base_limits is not string
+      - base_limits | length
+    quiet: true
+  when: base_limits is defined
+
+- name: check "base_directories" variable
+  tags: always
+  assert:
+    that:
+      - base_directories is iterable
+      - base_directories is not string
+    quiet: true
+  when: base_directories is defined
+
+- name: check "base_files" variable
+  tags: always
+  assert:
+    that:
+      - base_files is iterable
+      - base_files is not string
+    quiet: true
+  when: base_directories is defined

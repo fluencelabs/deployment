@@ -4,6 +4,7 @@ _arch_map:
   aarch64: arm64
   64-bit: amd64
 _version: "{{ nox_version | regex_replace('^(?!v)', 'v') }}"
+_semver_regex: "^v?\\d+\\.\\d+\\.\\d+$"
 _arch: "{{ _arch_map[ansible_architecture] }}"
 _download_url: "https://github.com/fluencelabs/nox/releases/download"
 _checksums: "{{ lookup('url', _download_url + '/nox-{{ _version }}/nox_SHA256_SUMS', wantlist=True) | list }}"

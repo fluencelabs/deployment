@@ -63,7 +63,7 @@
 - name: copy nox config
   tags: config
   template:
-    src: "{{ nox_project_dir }}/configs/nox-{{ instance }}_Config.toml"
+    src: "files/{{ nox_project_dir }}/configs/nox-{{ instance }}_Config.toml"
     dest: "{{ nox_dir }}/nox-{{ instance }}/Config.toml"
     owner: "{{ nox_user }}"
     group: "{{ nox_group }}"

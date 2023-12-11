@@ -1,2 +1,1 @@
-# deployment
-Nox deployment packages and examples
+# deployments

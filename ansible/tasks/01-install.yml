@@ -13,6 +13,17 @@
     create_home: false
     state: present
 
+- name: cleanup nox state
+  tags: config
+  file:
+    path: "{{ nox_dir }}/nox-{{ instance }}"
+    state: absent
+  when: nox_cleanup_state
+  loop: "{{ nox_instances }}"
+  loop_control:
+    loop_var: instance
+    label: "nox-{{ instance }}"
+
 - name: create nox directories
   file:
     path: "{{ nox_dir }}/nox-{{ instance }}/state"
@@ -64,7 +75,7 @@
         loop_var: instance
         label: "nox-{{ instance }}"
       notify: restart nox
-      register: _binary
+      register: _binary_release
 
 - name: download nox snapshot to localhost
   become: false
@@ -127,7 +138,7 @@
         loop_var: instance
         label: "nox-{{ instance }}"
       notify: restart nox
-      register: _binary
+      register: _binary_snapshot
 
   always:
     - name: remove temporary directory
@@ -173,8 +184,9 @@
 
 - name: determine which instances to restart
   vars:
-    _binary_changed: "{{ _binary.results | selectattr('changed', 'equalto', true) | map(attribute='instance') | list }}"
+    _binary_release_changed: "{{ _binary_release.results | selectattr('changed', 'equalto', true) | map(attribute='instance') | list }}"
+    _binary_snapshot_changed: "{{ _binary_snapshot.results | selectattr('changed', 'equalto', true) | map(attribute='instance') | list }}"
     _config_changed: "{{ _config.results | selectattr('changed', 'equalto', true) | map(attribute='instance') | list }}"
-    _instances_changed: "{{ (_systemd is changed) | ternary(nox_instances, _binary_changed + _config_changed) }}"
+    _instances_changed: "{{ (_systemd is changed) | ternary(nox_instances, _binary_release_changed + _binary_snapshot_changed + _config_changed) }}"
   set_fact:
     _instances_to_restart: "{{ (nox_instances | select('in', _instances_changed) | list) | unique }}"

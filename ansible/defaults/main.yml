@@ -4,6 +4,7 @@ nox_group: "nox"
 nox_user: "nox"
 nox_dir: "/opt/nox"
 nox_project_dir: ".fluence"
+nox_cleanup_state: false
 nox_unit_file: |
   [Unit]
   Description=Nox - Rust implementation of the Fluence network peer

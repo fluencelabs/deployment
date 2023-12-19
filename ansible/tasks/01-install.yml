@@ -1,24 +1,3 @@
-- name: create files directory
-  become: false
-  run_once: true
-  delegate_to: localhost
-  file:
-    path: "{{ role_path }}/files/{{ nox_version }}"
-    state: directory
-
-- name: download nox to localhost
-  become: false
-  run_once: true
-  delegate_to: localhost
-  get_url:
-    url: "{{ _bin_url }}"
-    dest: "{{ role_path }}/files/{{ nox_version }}/{{ _bin }}"
-    # checksum: "sha256:{{ _checksums }}"
-  register: _download_bin
-  until: _download_bin is succeeded
-  retries: 5
-  delay: 2
-
 - name: create nox system group
   group:
     name: "{{ nox_group }}"
@@ -46,19 +25,116 @@
     loop_var: instance
     label: "nox-{{ instance }}"
 
-- name: propagate nox binary
-  copy:
-    src: "{{ role_path }}/files/{{ nox_version }}/{{ _bin }}"
-    dest: "{{ nox_dir }}/nox-{{ instance }}/nox"
-    owner: "{{ dir.group | default('nox') }}"
-    group: "{{ dir.group | default('nox') }}"
-    mode: 0555
-  loop: "{{ nox_instances }}"
-  loop_control:
-    loop_var: instance
-    label: "nox-{{ instance }}"
-  notify: restart nox
-  register: _binary
+- name: download nox release to localhost
+  become: false
+  run_once: true
+  delegate_to: localhost
+  when: nox_run_id | string | length == 0
+  block:
+    - name: create files directory
+      become: false
+      run_once: true
+      delegate_to: localhost
+      file:
+        path: "{{ role_path }}/files/{{ nox_version }}"
+        state: directory
+
+    - name: download nox binary
+      get_url:
+        url: "{{ _bin_url }}"
+        dest: "{{ role_path }}/files/{{ nox_version }}/{{ _bin }}"
+        # checksum: "sha256:{{ _checksums }}"
+      register: _download_bin
+      until: _download_bin is succeeded
+      retries: 5
+      delay: 2
+
+    - name: propagate nox binary
+      become: true
+      run_once: false
+      delegate_to: "{{ inventory_hostname }}"
+      copy:
+        src: "{{ role_path }}/files/{{ nox_version }}/{{ _bin }}"
+        dest: "{{ nox_dir }}/nox-{{ instance }}/nox"
+        owner: "{{ dir.group | default('nox') }}"
+        group: "{{ dir.group | default('nox') }}"
+        mode: 0555
+      loop: "{{ nox_instances }}"
+      loop_control:
+        loop_var: instance
+        label: "nox-{{ instance }}"
+      notify: restart nox
+      register: _binary
+
+- name: download nox snapshot to localhost
+  become: false
+  run_once: true
+  delegate_to: localhost
+  vars:
+    github_token: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+  when: nox_run_id | string | length
+  block:
+    - name: get list of artifacts from GitHub API
+      uri:
+        url: "https://api.github.com/repos/fluencelabs/nox/actions/runs/{{ nox_run_id }}/artifacts"
+        method: GET
+        headers:
+          Accept: "application/vnd.github.v3+json"
+        return_content: true
+      register: _artifacts_response
+
+    - name: parse the artifact download URL
+      set_fact:
+        _artifact_download_url: "{{ item.archive_download_url }}"
+      loop: "{{ _artifacts_response.json.artifacts }}"
+      when: "item.name == _bin"
+      loop_control:
+        label: "{{ item.url }}"
+
+    - name: create a temporary directory
+      tempfile:
+        state: directory
+      register: _artifact_temp_dir
+
+    - name: download the artifact
+      get_url:
+        url: "{{ _artifact_download_url }}"
+        dest: "{{ _artifact_temp_dir.path }}/{{ _bin }}.zip"
+        headers:
+          Authorization: "token {{ github_token }}"
+      register: _download_artifact
+      until: _download_artifact is succeeded
+      retries: 5
+      delay: 2
+
+    - name: unarchive the downloaded artifact
+      unarchive:
+        src: "{{ _artifact_temp_dir.path }}/{{ _bin }}.zip"
+        dest: "{{ _artifact_temp_dir.path }}/"
+
+    - name: propagate nox binary
+      become: true
+      run_once: false
+      delegate_to: "{{ inventory_hostname }}"
+      copy:
+        src: "{{ _artifact_temp_dir.path }}/nox"
+        dest: "{{ nox_dir }}/nox-{{ instance }}/nox"
+        owner: "{{ dir.group | default('nox') }}"
+        group: "{{ dir.group | default('nox') }}"
+        mode: 0555
+      loop: "{{ nox_instances }}"
+      loop_control:
+        loop_var: instance
+        label: "nox-{{ instance }}"
+      notify: restart nox
+      register: _binary
+
+  always:
+    - name: remove temporary directory
+      file:
+        path: "{{ _artifact_temp_dir.path }}"
+        state: absent
+      when: _artifact_temp_dir.path is defined
 
 - name: copy nox config
   tags: config

@@ -14,7 +14,6 @@
     state: present
 
 - name: cleanup nox state
-  tags: config
   file:
     path: "{{ nox_dir }}/nox-{{ instance }}"
     state: absent
@@ -148,7 +147,6 @@
       when: _artifact_temp_dir.path is defined
 
 - name: copy nox config
-  tags: config
   template:
     src: "files/{{ nox_project_dir }}/configs/nox-{{ instance }}_Config.toml"
     dest: "{{ nox_dir }}/nox-{{ instance }}/Config.toml"
@@ -163,7 +161,6 @@
   register: _config
 
 - name: create nox unit file
-  tags: config
   copy:
     content: "{{ nox_unit_file }}"
     dest: "/etc/systemd/system/nox-@.service"

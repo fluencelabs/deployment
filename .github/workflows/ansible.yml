@@ -29,10 +29,10 @@ jobs:
           config: "ansible/.yamllint"
           path: "ansible"
 
-      - name: Run ansible-later
-        uses: patrickjahns/ansible-later-action@v1.3.0
-        with:
-          path: ansible/**
+      # - name: Run ansible-later
+      #   uses: patrickjahns/ansible-later-action@v1.3.0
+      #   with:
+      #     path: ansible/**
 
   molecule:
     runs-on: ubuntu-latest

@@ -22,6 +22,7 @@
       unarchive:
         src: "{{ role_path }}/files/ipfs/{{ _ipfs_version }}/{{ _ipfs_archive }}"
         dest: "{{ role_path }}/files/ipfs/{{ _ipfs_version }}/{{ _arch }}"
+        creates: "{{ role_path }}/files/ipfs/{{ _ipfs_version }}/{{ _arch }}/ipfs"
         extra_opts:
           - "--strip-components=1"
           - "kubo/ipfs"

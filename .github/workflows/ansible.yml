@@ -28,11 +28,13 @@ jobs:
         uses: reviewdog/action-yamllint@v1
         with:
           fail_on_error: true
+          yamllint_flags: "ansible/"
 
       - name: Run ansible-lint
         uses: reviewdog/action-ansiblelint@v1
         with:
           fail_on_error: true
+          ansiblelint_flags: "-x core ansible/*"
 
   molecule:
     runs-on: ubuntu-latest

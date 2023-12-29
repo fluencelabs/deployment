@@ -58,3 +58,13 @@
   loop_control:
     label: "nox-{{ item.instance }}"
   failed_when: not item.stat.exists
+
+- name: check "nox_ipfs_version" variable
+  tags: always
+  assert:
+    that:
+      - nox_ipfs_version is defined
+      - nox_ipfs_version is string
+      - nox_ipfs_version | length
+      - nox_ipfs_version is regex(_semver_regex)
+    quiet: true

@@ -7,3 +7,6 @@
 
 - name: Install Nox
   include_tasks: 02-install.yml
+
+- name: Download IPFS CLI
+  include_tasks: 03-ipfs.yml

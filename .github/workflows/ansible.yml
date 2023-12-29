@@ -26,7 +26,6 @@ jobs:
 
       - name: Run yamllint
         uses: reviewdog/action-yamllint@v1
-        workdir: ansible
         with:
           fail_on_error: true
 
@@ -47,7 +46,8 @@ jobs:
           - ubuntu2204
 
     defaults:
-      working-directory: ansible
+      run:
+        working-directory: ansible
 
     steps:
       - uses: actions/checkout@v4

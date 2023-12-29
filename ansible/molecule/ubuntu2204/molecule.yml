@@ -15,7 +15,7 @@ provisioner:
   inventory:
     group_vars:
       all:
-        nox_instances: [1,2]
+        nox_instances: [1, 2]
 
 verifier:
   name: testinfra

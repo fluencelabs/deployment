@@ -5,13 +5,13 @@
   block:
     - name: create IPFS directory on localhost
       file:
-        path: "{{ role_path }}/files/ipfs-{{ _ipfs_version }}"
+        path: "{{ role_path }}/files/ipfs/{{ _ipfs_version }}/{{ _arch }}"
         state: directory
 
     - name: download IPFS archive
       get_url:
         url: "{{ _ipfs_download_url }}"
-        dest: "{{ role_path }}/files/ipfs-{{ _ipfs_version }}/{{ _ipfs_archive }}"
+        dest: "{{ role_path }}/files/ipfs/{{ _ipfs_version }}/{{ _ipfs_archive }}"
         checksum: "{{ _ipfs_checksums }}"
       register: _download_ipfs
       until: _download_ipfs is succeeded
@@ -20,15 +20,15 @@
 
     - name: extract IPFS binary
       unarchive:
-        src: "{{ role_path }}/files/ipfs-{{ _ipfs_version }}/{{ _ipfs_archive }}"
-        dest: "{{ role_path }}/files/ipfs-{{ _ipfs_version }}"
+        src: "{{ role_path }}/files/ipfs/{{ _ipfs_version }}/{{ _ipfs_archive }}"
+        dest: "{{ role_path }}/files/ipfs/{{ _ipfs_version }}/{{ _arch }}"
         extra_opts:
-        - "--transform"
-        - "s/^kubo/{{ _ipfs_bin }}/"
+          - "--strip-components=1"
+          - "kubo/ipfs"
 
 - name: propagate IPFS binary
   copy:
-    src: "{{ role_path }}/files/ipfs-{{ _ipfs_version }}/{{ _ipfs_bin }}"
+    src: "{{ role_path }}/files/ipfs/{{ _ipfs_version }}/{{ _arch }}/ipfs"
     dest: "{{ nox_dir }}/ipfs"
     owner: "{{ nox_user }}"
     group: "{{ nox_group }}"

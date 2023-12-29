@@ -46,13 +46,13 @@
       run_once: true
       delegate_to: localhost
       file:
-        path: "{{ role_path }}/files/{{ _nox_version }}"
+        path: "{{ role_path }}/files/nox/{{ _nox_version }}"
         state: directory
 
     - name: download nox binary
       get_url:
         url: "{{ _nox_download_url }}/{{ _nox_bin }}"
-        dest: "{{ role_path }}/files/{{ _nox_version }}/{{ _nox_bin }}"
+        dest: "{{ role_path }}/files/nox/{{ _nox_version }}/{{ _nox_bin }}"
         checksum: "{{ _nox_checksums }}"
       register: _download_bin
       until: _download_bin is succeeded
@@ -64,7 +64,7 @@
       run_once: false
       delegate_to: "{{ inventory_hostname }}"
       copy:
-        src: "{{ role_path }}/files/{{ _nox_version }}/{{ _nox_bin }}"
+        src: "{{ role_path }}/files/nox/{{ _nox_version }}/{{ _nox_bin }}"
         dest: "{{ nox_dir }}/nox-{{ instance }}/nox"
         owner: "{{ nox_user }}"
         group: "{{ nox_group }}"

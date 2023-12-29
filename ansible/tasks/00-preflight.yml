@@ -17,6 +17,10 @@
       - nox_instances is not string
     quiet: true
 
+- name: convert all elements in nox_instances to strings
+  set_fact:
+    nox_instances: "{{ nox_instances | map('string') | list }}"
+
 - name: check "nox_version" variable
   tags: always
   assert:

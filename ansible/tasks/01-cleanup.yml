@@ -1,6 +1,7 @@
 - name: get list of all running nox instances
   command: systemctl list-units --type=service --no-legend --no-pager nox-@*
   register: _running_instances
+  changed_when: false
 
 - name: extract running nox instance names
   vars:
@@ -9,6 +10,10 @@
                            | list }}"
   set_fact:
     _cleanup_instances: "{{ _present_instances | difference(nox_instances) | default([]) }}"
+  changed_when: false
+
+- debug:
+    msg: "{{ _cleanup_instances }}"
 
 - name: cleanup nox instances
   when: _cleanup_instances | length
@@ -27,7 +32,6 @@
       file:
         path: "{{ nox_dir }}/nox-{{ instance }}"
         state: absent
-        mode: 0755
       loop: "{{ _cleanup_instances }}"
       loop_control:
         loop_var: instance

@@ -12,7 +12,8 @@
     _cleanup_instances: "{{ _present_instances | difference(nox_instances) | default([]) }}"
   changed_when: false
 
-- debug:
+- name: instances to cleanup
+  debug:
     msg: "{{ _cleanup_instances }}"
 
 - name: cleanup nox instances

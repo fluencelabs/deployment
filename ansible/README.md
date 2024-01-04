@@ -9,8 +9,7 @@ implementation of the Fluence network peer.
 
 - Install
   [Fluence CLI](https://github.com/fluencelabs/cli?tab=readme-ov-file#installation-and-usage)
-- Generate sample provider config:
-
+- Generate sample provider config in directory with ansible playbook:
 ```bash
 mkdir files && cd files
 fluence provider gen --env local --name playground --noxes 3 --no-input
@@ -18,7 +17,6 @@ fluence provider gen --env local --name playground --noxes 3 --no-input
 
 - Adapt provider config in `playground/provider_playground.yml` for your setup.
   For example:
-
 ```yaml
 # yaml-language-server: $schema=../.fluence/schemas/provider.json
 
@@ -75,7 +73,6 @@ nox:
 ```
 
 - Regenerate nox configs
-
 ```bash
 fluence provider gen --name playground
 ```
@@ -120,7 +117,6 @@ fluence provider gen --name playground
       - "nox"
   ```
 - Install nox
-
 ```bash
 ansible-playbook nox.yml
 ```

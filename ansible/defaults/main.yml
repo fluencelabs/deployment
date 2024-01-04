@@ -23,9 +23,3 @@ nox_unit_file: |
 
   [Install]
   WantedBy=multi-user.target
-
-# example
-# nox_version: "0.16.13"
-# nox_ipfs_version: "0.25.0"
-# nox_project_dir: "playground"
-# nox_instances: [0, 1, 2]

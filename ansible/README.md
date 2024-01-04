@@ -10,72 +10,72 @@ implementation of the Fluence network peer.
 - Install
   [Fluence CLI](https://github.com/fluencelabs/cli?tab=readme-ov-file#installation-and-usage)
 - Generate sample provider config in directory with ansible playbook:
-```bash
-mkdir files && cd files
-fluence provider gen --env local --name playground --noxes 3 --no-input
-```
+    ```bash
+    mkdir files && cd files
+    fluence provider gen --env local --name playground --noxes 3 --no-input
+    ```
 
 - Adapt provider config in `playground/provider_playground.yml` for your setup.
   For example:
-```yaml
-# yaml-language-server: $schema=../.fluence/schemas/provider.json
+    ```yaml
+    # yaml-language-server: $schema=../.fluence/schemas/provider.json
 
-# Defines config used for provider set up
+    # Defines config used for provider set up
 
-# Documentation: https://github.com/fluencelabs/cli/tree/main/docs/configs/provider.md
+    # Documentation: https://github.com/fluencelabs/cli/tree/main/docs/configs/provider.md
 
-version: 0
+    version: 0
 
-env: local
+    env: local
 
-computePeers:
-  nox-0:
-    computeUnits: 1
-  nox-1:
-    computeUnits: 1
-  nox-2:
-    computeUnits: 1
-
-offers:
-  offer:
-    maxCollateralPerWorker: 1
-    minPricePerWorkerEpoch: 0.1
     computePeers:
-      - nox-0
-      - nox-1
-      - nox-2
+      nox-0:
+        computeUnits: 1
+      nox-1:
+        computeUnits: 1
+      nox-2:
+        computeUnits: 1
 
-nox:
-  # you can write config overrides with yaml syntax using camelCase
-  systemServices:
-    enabled:
-        - aqua-apfs
-        - decider
-        - trust-graph
+    offers:
+      offer:
+        maxCollateralPerWorker: 1
+        minPricePerWorkerEpoch: 0.1
+        computePeers:
+          - nox-0
+          - nox-1
+          - nox-2
 
-  # or you can write config in toml
-  # some options can be set only with rawConfig
-  # this has highest priority when merging
-  rawConfig: |
-    allowed_binaries = [
-      "/usr/bin/curl",
-      # we need to set path to ipfs binary that was downloaded by role
-      "{{ nox_dir }}/ipfs",
-    ]
+    nox:
+      # you can write config overrides with yaml syntax using camelCase
+      systemServices:
+        enabled:
+            - aqua-apfs
+            - decider
+            - trust-graph
 
-    [system_services]
-        [aqua-apfs]
-          external_api_multiaddres = "/ip4/ipfs.playground.com/tcp/5001"
-          local_api_multiaddres = "/ip4/ipfs.service.consul/tcp/5001"
-        decider:
-          worker_ipfs_multiaddr = "/dns4/ipfs.playground.com/tcp/5001"
-          network_api_endpoint = "https://somechain.com"
-```
+      # or you can write config in toml
+      # some options can be set only with rawConfig
+      # this has highest priority when merging
+      rawConfig: |
+        allowed_binaries = [
+          "/usr/bin/curl",
+          # we need to set path to ipfs binary that was downloaded by role
+          "{{ nox_dir }}/ipfs",
+        ]
+
+        [system_services]
+            [aqua-apfs]
+              external_api_multiaddres = "/ip4/ipfs.playground.com/tcp/5001"
+              local_api_multiaddres = "/ip4/ipfs.service.consul/tcp/5001"
+            decider:
+              worker_ipfs_multiaddr = "/dns4/ipfs.playground.com/tcp/5001"
+              network_api_endpoint = "https://somechain.com"
+    ```
 
 - Regenerate nox configs
-```bash
-fluence provider gen --name playground
-```
+    ```bash
+    fluence provider gen --name playground
+    ```
 
 ### Install and configure nox using ansible role
 
@@ -99,34 +99,33 @@ fluence provider gen --name playground
 
 - Download role and prepare playbook:
   - Create `requirements.yml`
-  ```yml
-  roles:
-    - name: fluencelabs.nox
-      version: 0.1.0
-      name: nox
-  ```
+      ```yml
+      roles:
+        - name: fluencelabs.nox
+          version: 0.1.0
+          name: nox
+      ```
   - Install nox role
-  ```bash
-  ansible-galaxy install -r requirements.yml --force
-  ```
+      ```bash
+      ansible-galaxy install -r requirements.yml --force
+      ```
   - Create `nox.yml` playbook:
-  ```yml
-  - hosts: "all"
-    become: true
-    roles:
-      - "nox"
-  ```
+      ```yml
+      - hosts: "all"
+        become: true
+        roles:
+          - "nox"
+      ```
 - Install nox
-```bash
-ansible-playbook nox.yml
-```
+    ```bash
+    ansible-playbook nox.yml
+    ```
 
 This will run `nox-0` and `nox-1` on `instance-0` and `nox-2` on `instance-1`.
 
 ### Cleanup nox state
 
 Rerun playbook with `nox_cleanup_state` set to `true`:
-
 ```bash
 ansible-playbook nox.yml -e "nox_cleanup_state=true"
 ```
@@ -156,7 +155,6 @@ Reassign `nox-0` to `instance-1`
   ```
 
 and run playbook:
-
 ```bash
 ansible-playbook nox.yml
 ```
@@ -171,10 +169,9 @@ Only for Fluence Labs members.
   https://github.com/fluencelabs/nox/actions/runs/7409293504 - `7409293504` is
   run id
 - Rerun role providing your `GITHUB_TOKEN` as env variable:
-
-```bash
-GITHUB_TOKEN=<your_token> ansible-playbook nox.yml -e "nox_run_id=7409293504"
-```
+    ```bash
+    GITHUB_TOKEN=<your_token> ansible-playbook nox.yml -e "nox_run_id=7409293504"
+    ```
 
 ## Role Variables
 

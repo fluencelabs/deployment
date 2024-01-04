@@ -197,9 +197,9 @@ See [defaults/](https://github.com/fluencelabs/deployment/blob/main/ansible/defa
 - root nox directory
 - type: string
 - default:
-  ```yml
-  nox_dir: "/opt/nox"
-  ```
+    ```yml
+    nox_dir: "/opt/nox"
+    ```
 
 It will contain everything this role creates: IPFS binary, nox instances
 subdirectories (`nox-1`, `nox-foo` etc) with nox binaries, configs and state.
@@ -210,9 +210,9 @@ subdirectories (`nox-1`, `nox-foo` etc) with nox binaries, configs and state.
   [Fluence CLI](https://github.com/fluencelabs/cli) from `provider.yaml` config.
 - type: string
 - default:
-  ```yml
-  nox_project_dir: ".fluence"
-  ```
+    ```yml
+    nox_project_dir: ".fluence"
+    ```
 
 Should be put to `files/` directory where you run this role.
 
@@ -227,28 +227,27 @@ Should be put to `files/` directory where you run this role.
 - owner of Nox process and files
 - type: string
 - default:
-  ```yml
-  nox_user: "nox"
-  ```
+    ```yml
+    nox_user: "nox"
+    ```
 
 #### `nox_group`
 
 - group of `nox_user`
 - type: string
 - default:
-  ```yml
-  nox_group: "nox"
-  ```
+    ```yml
+    nox_group: "nox"
+    ```
 
 #### `nox_cleanup_state`
 
 - whether to cleanup nox state.
 - type: bool
 - default:
-
-```yml
-nox_cleanup_state: false
-```
+    ```yml
+    nox_cleanup_state: false
+    ```
 
 #### `nox_run_id`
 

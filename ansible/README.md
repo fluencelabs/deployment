@@ -220,7 +220,7 @@ Should be put to `files/` directory where you run this role.
 
 - systemd unit file
 - type: string
-- default: see [defaults/main.yml](https://github.com/fluencelabs/deployment/blob/FLU-542/ansible/defaults/main.yml)
+- default: see [defaults/main.yml](https://github.com/fluencelabs/deployment/blob/main/ansible/defaults/main.yml)
 
 #### `nox_user`
 

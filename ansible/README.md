@@ -11,11 +11,11 @@ implementation of the Fluence network peer.
   [Fluence CLI](https://github.com/fluencelabs/cli?tab=readme-ov-file#installation-and-usage)
 - Generate sample provider config in directory with ansible playbook:
     ```bash
-    mkdir files && cd files
-    fluence provider gen --env local --name playground --noxes 3 --no-input
+    mkdir files/playground -p && cd files/playground
+    fluence provider gen --env local --noxes 3 --no-input
     ```
 
-- Adapt provider config in `playground/provider_playground.yml` for your setup.
+- Adapt provider config in `playground/provider.yml` for your setup.
   For example:
     ```yaml
     # yaml-language-server: $schema=../.fluence/schemas/provider.json
@@ -72,9 +72,11 @@ implementation of the Fluence network peer.
               network_api_endpoint = "https://somechain.com"
     ```
 
+- Have a look at secrets config at `.fluence/procider-secrets.yaml` - it should be made private and not commited to git
+
 - Regenerate nox configs
     ```bash
-    fluence provider gen --name playground
+    fluence provider gen
     ```
 
 ### Install and configure nox using ansible role

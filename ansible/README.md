@@ -72,7 +72,7 @@ implementation of the Fluence network peer.
               network_api_endpoint = "https://somechain.com"
     ```
 
-- Have a look at secrets config at `.fluence/procider-secrets.yaml` - it should be made private and not commited to git
+- Have a look at secrets config at `.fluence/provider-secrets.yaml` - it should be made private and not commited to git
 
 - Regenerate nox configs
     ```bash

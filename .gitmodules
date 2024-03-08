@@ -1,4 +1,0 @@
-[submodule "ansible"]
-	path = ansible
-	url = https://github.com/fluencelabs/ansible
-	branch = main

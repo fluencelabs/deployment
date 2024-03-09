@@ -15,6 +15,6 @@ all:
         # Need to be set according to the required version for the following components.
         nox_version: "0.23.0"
         ipfs_cli_version: "0.26.0"
-        ccp_version: "0.3.0"
+        ccp_version: "0.4.0"
         # Need to be set according to folder name inside files directory
         fluence_project_dir: "any_project_name"

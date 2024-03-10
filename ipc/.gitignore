@@ -1,0 +1,6 @@
+*/data
+!*/data/.keep
+.env
+ipc-cli/evm_keystore.json
+keys/*
+!keys/.keep

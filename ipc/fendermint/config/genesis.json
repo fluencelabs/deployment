@@ -1,0 +1,58 @@
+{
+  "chain_name": "/r314159/t410fgalav7yo342zbem3kkqhx4l5d43d3iyswlpwkby",
+  "timestamp": 1411149,
+  "network_version": 21,
+  "base_fee": "1000",
+  "power_scale": 3,
+  "validators": [
+    {
+      "public_key": "BEU1pGlPqJzy87/wWG88uvGZ5EwcDB5QRLRMS8KzJBSvZRvLlm3NWmWzLwxSczQ7shcXhR7+1k57YpIjHNGMy7g=",
+      "power": "1000000000000000000"
+    },
+    {
+      "public_key": "BAtXERvl2e1iUQSOCYGUxLM9eHpwz3RIPe0CYYsSF9w2eq5/KR9zLFGeOZ/7WmRkGpGihLFgSjdGekOS6/AGFCc=",
+      "power": "1000000000000000000"
+    },
+    {
+      "public_key": "BAF1EbTbCAOOY7Wm0eqi7ClitXLj/Oyds8uLsxVNgScOGV2k/KnIOnJw3/EDLc9SkSPSzhxKDesVKbTIM5WXoNA=",
+      "power": "1000000000000000000"
+    }
+  ],
+  "accounts": [
+    {
+      "meta": {
+        "Account": {
+          "owner": "t410ftlho7wk46tjbwm3fkm6bktx2fgxjkgzefrvlbga"
+        }
+      },
+      "balance": "1000000000000000000"
+    },
+    {
+      "meta": {
+        "Account": {
+          "owner": "t410fu2lsa6mlepmcu3skplvrybb42e6lwlcipqwcirq"
+        }
+      },
+      "balance": "1000000000000000000"
+    },
+    {
+      "meta": {
+        "Account": {
+          "owner": "t410fzuwbfqwbnvlnycfghpi2dbrxihvue77rioxn2ry"
+        }
+      },
+      "balance": "1000000000000000000"
+    }
+  ],
+  "eam_permission_mode": {
+    "mode": "unrestricted"
+  },
+  "ipc": {
+    "gateway": {
+      "subnet_id": "/r314159/t410fgalav7yo342zbem3kkqhx4l5d43d3iyswlpwkby",
+      "bottom_up_check_period": 30,
+      "majority_percentage": 60,
+      "active_validators_limit": 100
+    }
+  }
+}

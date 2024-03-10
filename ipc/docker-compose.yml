@@ -1,0 +1,84 @@
+services:
+  fendermint:
+    image: fluencelabs/fendermint
+    user: "${DOCKER_UID}"
+    environment:
+      FM_NETWORK: testnet
+      FM_CHAIN_NAME: "t410fgalav7yo342zbem3kkqhx4l5d43d3iyswlpwkby"
+      FM_IPC__SUBNET_ID: "/r314159/t410fgalav7yo342zbem3kkqhx4l5d43d3iyswlpwkby"
+      FM_TENDERMINT_RPC_URL: "http://cometbft:26657"
+      FM_RESOLVER__CONNECTION__LISTEN_ADDR: "/ip4/0.0.0.0/tcp/26659"
+      FM_ABCI__LISTEN__HOST: "0.0.0.0"
+      FM_ABCI__LISTEN__PORT: "26658"
+      FM_RESOLVER__DISCOVERY__STATIC_ADDRESSES: "/dns4/ipc-test-0.fluence.dev/tcp/27659/p2p/16Uiu2HAm5nsX3d17nYUBd4AcazbNw368fpgC3btgjayBH3UkztbN"
+      FM_RESOLVER__NETWORK__LOCAL_KEY: "/fendermint/keys/network.sk"
+      FM_VALIDATOR_KEY__PATH: "/fendermint/keys/validator.sk"
+      FM_VALIDATOR_KEY__KIND: "ethereum"
+    expose:
+      - 26659 # p2p
+      - 26658 # abci
+    ports:
+      - "26659:26659" # p2p
+    volumes:
+      - ./fendermint/data:/fendermint/data
+      - ./fendermint/config:/fendermint/config
+      - ./keys:/fendermint/keys
+
+  cometbft:
+    image: cometbft/cometbft:v0.37.x
+    user: "${DOCKER_UID}"
+    environment:
+      CMT_LOG_LEVEL: "info"
+      CMT_LOG_FORMAT: "plain"
+      CMT_NODE_KEY_FILE: "/cometbft/data/node_key.json"
+      CMT_GENESIS_FILE: "/cometbft/config/genesis.json"
+      CMT_PRIV_VALIDATOR_KEY_FILE: "/cometbft/keys/priv_validator_key.json"
+      CMT_PRIV_VALIDATOR_STATE_FILE: "/cometbft/config/priv_validator_key_state.json"
+      CMT_DB_DIR: "/cometbft/data/db"
+      CMT_PROXY_APP: "tcp://fendermint:26658"
+      CMT_P2P_LADDR: "tcp://0.0.0.0:26656"
+      CMT_RPC_LADDR: "tcp://0.0.0.0:26657"
+      CMT_P2P_PEX: true
+      CMT_P2P_SEEDS: "ff009220b2301b12ce2ff8ce172be0d63e8203fc@ipc-test-0.fluence.dev:26656"
+      CMT_P2P_SEED_MODE: true
+      CMT_P2P_ADDR_BOOK_FILE: "/cometbft/data/addrbook.json"
+      CMT_P2P_ADDR_BOOK_STRICT: true
+    env_file:
+      - .env
+    expose:
+      - 26657 # rpc
+      - 26656 # p2p
+    ports:
+      - "26656:26656" # p2p
+    volumes:
+      - ./cometbft/data:/cometbft/data
+      - ./cometbft/config:/cometbft/config
+      - ./keys:/cometbft/keys
+    healthcheck:
+      test: curl --fail http://localhost:26657 || exit 1
+      interval: 8s
+      timeout: 10s
+      retries: 20
+    depends_on:
+      - fendermint
+
+  eth:
+    image: fluencelabs/fendermint
+    environment:
+      FM_NETWORK: testnet
+      TENDERMINT_RPC_URL: "http://cometbft:26657"
+      TENDERMINT_WS_URL: "ws://cometbft:26657/websocket"
+    command: "eth run"
+    ports:
+      - "8545:8545"
+    healthcheck:
+      test: |
+        curl -s -X POST 'http://localhost:8545' -H 'Content-Type: application/json' \
+          --data '{"jsonrpc":"2.0", "method":"eth_chainId", "params":[], "id":1}' \
+          | jq -e '.result != null'
+      interval: 8s
+      timeout: 10s
+      retries: 20
+    depends_on:
+      cometbft:
+        condition: service_healthy

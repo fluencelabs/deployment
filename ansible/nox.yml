@@ -2,3 +2,5 @@
   become: true
   roles:
     - "fluencelabs.provider.nox"
+    # uncomment if you want to ship logs to fluence team
+    # - "fluencelabs.provider.promtail"

@@ -4,7 +4,7 @@ all:
       hosts:
         server-0:
           ansible_host: "<host_ip>"
-          ansible_host: "<ssh_user>"
+          ansible_user: "<ssh_user>"
           fluence_instance_id: "nox-0"
 
       vars:

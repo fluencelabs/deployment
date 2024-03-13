@@ -4,13 +4,14 @@ all:
       hosts:
         server-0:
           ansible_host: "<host_ip>"
+          ansible_host: "<ssh_user>"
           fluence_instance_id: "nox-0"
 
       vars:
         # Need to be set according to the required version for the following components.
-        nox_version: "0.22.0"
+        nox_version: "0.23.2"
         ipfs_cli_version: "0.26.0"
-        ccp_version: "0.2.0"
+        ccp_version: "0.7.1"
         # Need to be set according to project name inside files directory
         fluence_project_dir: "<fluence_project_dir>"
         # Set only if you want to ship logs to Fluence team

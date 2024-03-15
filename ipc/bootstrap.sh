@@ -19,6 +19,8 @@ HELP
 
 generate_env() {
 cat<<ENV > .env
+FENDERMINT_IMAGE=${fendermint_image}
+COMETBFT_IMAGE=${cometbft_image}
 # Subnet ID to connect to
 FM_IPC__SUBNET_ID="${subnet_id}"
 # Address of gateway contract

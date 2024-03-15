@@ -1,6 +1,6 @@
 services:
   fendermint:
-    image: fluencelabs/fendermint
+    image: ${FENDERMINT_IMAGE}
     user: "root"
     environment:
       FM_NETWORK: testnet
@@ -33,7 +33,7 @@ services:
       - ./keys:/fendermint/keys
 
   cometbft:
-    image: cometbft/cometbft:v0.37.x
+    image: ${COMETBFT_IMAGE}
     user: "root"
     environment:
       CMT_LOG_LEVEL: "info"
@@ -71,7 +71,7 @@ services:
       - fendermint
 
   eth-api:
-    image: fluencelabs/fendermint
+    image: ${FENDERMINT_IMAGE}
     environment:
       FM_NETWORK: testnet
       TENDERMINT_RPC_URL: "http://cometbft:26657"

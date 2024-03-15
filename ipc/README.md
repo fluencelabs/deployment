@@ -3,11 +3,18 @@
 ## Prepare
 
 Pull configure IPC, pull genesis file, create keys with one command:
+
 ```shell
 ./boostrap.sh --env ENV --name NAME --ip IP
 ```
 
 See `./boostrap.sh -h` for more info.
+
+## Ports used
+
+- 8545 - chain RPC endpoint. Should be accessible by nox
+- 26659 - fendermint p2p. Should be accessible from internet
+- 26656 - cometbft p2p. Should be accessible from internet
 
 ## Run
 
@@ -16,6 +23,7 @@ docker compose up -d
 ```
 
 ## Structure
+
 ```
 .
 ├── bootstrap.sh  # script to bootstrap validator

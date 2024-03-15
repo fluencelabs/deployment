@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+set -euo pipefail
+
 cometbft_image="cometbft/cometbft:v0.37.x"
 fendermint_image="fluencelabs/fendermint@sha256:5fd86d2c3124aab2c480f5029202378afaec90344eec01a126e05945016ea8bc"
 
@@ -105,9 +107,11 @@ case "$env" in
   ;;
 esac
 
-subnet_id="$(curl -sS -f https://cometbft.${env}.fluence.dev/genesis | jq .result.genesis.app_state.chain_name -r)"
+subnet_id="$(curl -s -f https://cometbft.${env}.fluence.dev/genesis | jq .result.genesis.app_state.chain_name -r)"
+trust_height="$(curl -s -f https://cometbft.${env}.fluence.dev/commit | jq .result.signed_header.header.height -r)"
+trust_hash="$(curl -s -f https://cometbft.${env}.fluence.dev/commit | jq .result.signed_header.commit.block_id.hash -r)"
 
-curl -sS https://cometbft.${env}.fluence.dev/genesis | jq .result.genesis > cometbft/config/genesis.json
+curl -s -f https://cometbft.${env}.fluence.dev/genesis | jq .result.genesis > cometbft/config/genesis.json
 
 generate_env
 

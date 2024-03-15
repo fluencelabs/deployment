@@ -2,45 +2,42 @@
 
 ## Prepare
 
-- Copy env template file and change placeholders to real values:
-
+Pull configure IPC, pull genesis file, create keys with one command:
 ```shell
-cp template.env .env
+./boostrap.sh --env ENV --name NAME --ip IP
 ```
 
-- Generate fendermint network key:
-
-```shell
-docker run --rm --user ${UID} -v ./keys:/keys fluencelabs/fendermint key gen --out-dir /keys/ --name network
-```
-
-- Create key validator wallet (not sure about this and following parts):
-
-```shell
-docker run --rm --user ${UID} -v ./ipc-cli:/ipc ghcr.io/consensus-shipyard/fendermint ipc-cli --config-path /ipc/config.toml wallet new --wallet-type evm
-```
-
-- Export validator key. Make sure to change `<address>` to address from previous
-  step:
-
-```shell
-docker run --rm --user ${UID} -v ./ipc-cli:/ipc -v ./keys:/keys ghcr.io/consensus-shipyard/fendermint ipc-cli --config-path /ipc/config.toml wallet export --wallet-type evm --address <address> --hex > ./keys/validator.eth
-```
-
-- Convert validator key to fendermint format:
-
-```shell
-docker run --rm --user ${UID} -v ./keys:/keys fluencelabs/fendermint key eth-to-fendermint --secret-key /keys/validator.eth --name validator --out-dir /keys
-```
-
-- Convert validator key to cometbft format:
-
-```shell
-docker run --rm --user ${UID} -v ./keys:/keys fluencelabs/fendermint key into-tendermint --secret-key /keys/validator.sk --out /keys/priv_validator_key.json
-```
+See `./boostrap.sh -h` for more info.
 
 ## Run
 
 ```shell
-DOCKER_UID=$(id -u) docker compose up -d
+docker compose up -d
+```
+
+## Structure
+```
+.
+├── bootstrap.sh  # script to bootstrap validator
+├── cometbft
+│   ├── config    # cometbft predefined config
+│   └── data      # cometbft persistent data
+├── docker-compose.yml
+├── fendermint
+│   ├── config    # fendermint prefidined config
+│   ├── data      # fendermint persistent data
+│   └── snapshots # fendermint snapshots
+├── ipc-cli               # directory used by ipc cli to generate keys
+│   ├── config.toml       # default ipc-cli config
+│   └── evm_keystore.json # keysotre
+├── keys
+│   ├── fendermint.pk           # fendermint network public key
+│   ├── fendermint.sk           # fendermint network private key
+│   ├── priv_validator_key.json # validator keys in cometbft format
+│   ├── validator.address       # validator address in eth format
+│   ├── validator.pk            # validator public key
+│   ├── validator.pk.hex        # validator publick key in hex format
+│   ├── validator.sk            # validator secret key
+│   └── validator.sk.hex        # validator secret key in hex format
+└── README.md
 ```

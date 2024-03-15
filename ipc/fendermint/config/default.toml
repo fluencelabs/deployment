@@ -121,7 +121,7 @@ retry_delay = 10
 # Network Identity
 [resolver.network]
 # Secp256k1 private key used for signing network messages.
-# local_key = "keys/network.sk"
+local_key = "keys/network.sk"
 
 # Network name is used to differentiate the IPLD Resolver peer group.
 # The entire hierarchy should be in one peer group connected by GossipSub,
@@ -138,7 +138,7 @@ network_name = ""
 static_addresses = []
 
 # Number of connections at which point we pause further discovery lookups.
-target_connections = 5
+target_connections = 50
 
 # Option to disable Kademlia, for example in a fixed static network.
 enable_kademlia = true
@@ -200,3 +200,8 @@ subnet_id = "/r0"
 # The minimum is 1 seconds which is about the minimum target block time as well;
 # ideally one round of gossip per block should be as frequent as we would go.
 vote_interval = 1
+# Voting timeout about top-down finality, in seconds. After this time, if there is
+# no new height to vote on, the previous vote is re-published. This is to avoid
+# potential stalling because peers missed an important vote and the cache is full,
+# pausing the syncer, preventing new events to trigger votes.
+vote_timeout = 60

@@ -8,12 +8,3 @@ network_type = "fevm"
 provider_http = "https://api.calibration.node.glif.io/rpc/v1"
 gateway_addr = "0xfA6D6c9ccDE5B8a34690F0377F07dbf932b457aC"
 registry_addr = "0x12360EcF961f31d220b5e7E34c05652a68Ec27A0"
-
-[[subnets]]
-id = "/r314159/t410fu6ua642sypnlukccd3gaizwhonk5kwlpml6r3pa"
-
-[subnets.config]
-network_type = "fevm"
-provider_http = "https://ipc-test.fluence.dev/"
-gateway_addr = "0xfA6D6c9ccDE5B8a34690F0377F07dbf932b457aC"
-registry_addr = "0x12360EcF961f31d220b5e7E34c05652a68Ec27A0"

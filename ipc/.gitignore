@@ -1,6 +1,10 @@
 */data
 !*/data/.keep
+*/snapshots
+!*/snapshots/.keep
 .env
 ipc-cli/evm_keystore.json
 keys/*
 !keys/.keep
+cometbft/config/
+!cometbft/config/.keep

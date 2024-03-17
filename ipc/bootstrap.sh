@@ -21,6 +21,8 @@ generate_env() {
 cat<<ENV > .env
 FENDERMINT_IMAGE=${fendermint_image}
 COMETBFT_IMAGE=${cometbft_image}
+# chain name
+FM_CHAIN_NAME="${subnet_name}"
 # Subnet ID to connect to
 FM_IPC__SUBNET_ID="${subnet_id}"
 # Address of gateway contract
@@ -31,6 +33,10 @@ FM_IPC__TOPDOWN__PARENT_REGISTRY="${parent_registry}"
 FM_IPC__TOPDOWN__PARENT_HTTP_ENDPOINT="${parent_endpoint}"
 # Address of a seed fendermint node
 FM_RESOLVER__DISCOVERY__STATIC_ADDRESSES="${fendermint_seed}"
+# fendermint gossip network name
+FM_RESOLVER__NETWORK__NETWORK_NAME="${subnet_name}"
+# Our subnet should never be flushed
+FM_RESOLVER__MEMBERSHIP__STATIC_SUBNETS="${subnet_id}"
 
 # Human readable validator node name. Will appear in logs
 CMT_MONIKER="${name}"
@@ -100,8 +106,8 @@ case "$env" in
   ;;
   test)
     # TODO pulling of contract addresses
-    parent_gateway="0x916450AB79531281E8C9C58ebD6081A9A2C4d1DE"
-    parent_registry="0x8773355509c9a534A43Ce439E49EBFba928D048E"
+    parent_gateway="0x097AcfFF25367aDa2C5110E9005f51E0E9685B3B"
+    parent_registry="0xC5d8156A7021Eb1d9429aC91Ed6F4656F225a435"
     parent_endpoint="https://api.calibration.node.glif.io/rpc/v1"
     fendermint_seed="/dns4/fendermint.${env}.fluence.dev/tcp/26659/p2p/16Uiu2HAmQKdy7X6KRK2fAoMwVEdozfGSLwDQK15ptfTJRfKXqMwz"
     cometbft_seeds="2e1c1b8fd010d0e4dbbb00fb1c2b810587d95323@cometbft.${env}.fluence.dev:26656"
@@ -110,8 +116,8 @@ case "$env" in
 esac
 
 subnet_id="$(curl -s -f https://cometbft.${env}.fluence.dev/genesis | jq .result.genesis.app_state.chain_name -r)"
-trust_height="$(curl -s -f https://cometbft.${env}.fluence.dev/commit | jq .result.signed_header.header.height -r)"
-trust_hash="$(curl -s -f https://cometbft.${env}.fluence.dev/commit | jq .result.signed_header.commit.block_id.hash -r)"
+subnet_name="${subnet_id#/r*/}"
+read trust_height trust_hash <<<$(curl -s -f https://cometbft.${env}.fluence.dev/commit | jq -r '.result.signed_header.header.height + " " + .result.signed_header.commit.block_id.hash')
 
 curl -s -f https://cometbft.${env}.fluence.dev/genesis | jq .result.genesis > cometbft/config/genesis.json
 
@@ -131,9 +137,9 @@ echo "Generating fendermint key"
 docker run --rm --user ${UID} -v ./keys:/keys ${fendermint_image} key gen --out-dir /keys/ --name fendermint
 
 echo "Generating validator key"
-validator_address=$(docker run --rm --user ${UID} -v ./ipc-cli:/ipc ${fendermint_image} ipc-cli --config-path /ipc/config.toml 0 wallet new --wallet-type evm | tr -d \")
-validator_public=$(docker run --rm --user ${UID} -v ./ipc-cli:/ipc ${fendermint_image} ipc-cli --config-path /ipc/config.toml 0 wallet pub-key --wallet-type evm --address ${validator_address})
-validator_private=$(docker run --rm --user ${UID} -v ./ipc-cli:/ipc -v ./keys:/keys ${fendermint_image} ipc-cli --config-path /ipc/config.toml 0 wallet export --wallet-type evm --address ${validator_address} --hex)
+validator_address=$(docker run --rm --user ${UID} -v ./ipc-cli:/ipc ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet new --wallet-type evm | tr -d \")
+validator_public=$(docker run --rm --user ${UID} -v ./ipc-cli:/ipc ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet pub-key --wallet-type evm --address ${validator_address})
+validator_private=$(docker run --rm --user ${UID} -v ./ipc-cli:/ipc -v ./keys:/keys ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet export --wallet-type evm --address ${validator_address} --hex)
 echo $validator_address > ./keys/validator.address
 echo $validator_public > ./keys/validator.pk.hex
 echo $validator_private > ./keys/validator.sk.hex

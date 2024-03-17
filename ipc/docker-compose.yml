@@ -3,8 +3,8 @@ services:
     image: ${FENDERMINT_IMAGE}
     user: "root"
     environment:
-      FM_NETWORK: testnet
-      FM_CHAIN_NAME: "dar"
+      LOG_LEVEL: "info"
+      FM_NETWORK: "testnet"
       FM_TENDERMINT_RPC_URL: "http://cometbft:26657"
       FM_RESOLVER__CONNECTION__LISTEN_ADDR: "/ip4/0.0.0.0/tcp/26659"
       FM_ABCI__LISTEN__HOST: "0.0.0.0"
@@ -37,6 +37,7 @@ services:
     user: "root"
     environment:
       CMT_LOG_LEVEL: "info"
+      # CMT_LOG_LEVEL: "*:info,consensus:error,p2p:error"
       CMT_LOG_FORMAT: "plain"
       CMT_NODE_KEY_FILE: "/cometbft/keys/node_key.json"
       CMT_GENESIS_FILE: "/cometbft/config/genesis.json"

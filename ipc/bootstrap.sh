@@ -146,6 +146,13 @@ validator_private=$(docker run --rm --user ${UID} -e IPC_NETWORK=${network} -v .
 echo $validator_address > ./keys/validator.address
 echo $validator_public > ./keys/validator.pk.hex
 echo $validator_private > ./keys/validator.sk.hex
+cat << KEY > ./cometbft/config/priv_validator_key_state.json
+{
+  "height": "0",
+  "round": 0,
+  "step": 0
+}
+KEY
 
 echo "Converting validator key to fendermint format"
 docker run --rm --user ${UID} -e FM_NETWORK=${network} -v ./keys:/keys ${fendermint_image} key eth-to-fendermint --secret-key /keys/validator.sk.hex --name validator --out-dir /keys

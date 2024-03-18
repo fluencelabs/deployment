@@ -149,7 +149,7 @@ echo "Converting validator key to fendermint format"
 docker run --rm --user ${UID} -e FM_NETWORK=${network} -v ./keys:/keys ${fendermint_image} key eth-to-fendermint --secret-key /keys/validator.sk.hex --name validator --out-dir /keys
 
 echo "Converting validator key to cometbft format"
-docker run --rm --user ${UID} -e FM_NETWORK=${network }-v ./keys:/keys ${fendermint_image} key into-tendermint --secret-key /keys/validator.sk --out /keys/priv_validator_key.json
+docker run --rm --user ${UID} -e FM_NETWORK=${network}-v ./keys:/keys ${fendermint_image} key into-tendermint --secret-key /keys/validator.sk --out /keys/priv_validator_key.json
 
 cat <<FINISH
 

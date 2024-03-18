@@ -3,7 +3,7 @@
 set -euo pipefail
 
 cometbft_image="cometbft/cometbft:v0.37.x"
-fendermint_image="fluencelabs/fendermint@sha256:5fd86d2c3124aab2c480f5029202378afaec90344eec01a126e05945016ea8bc"
+fendermint_image="fluencelabs/fendermint:debug"
 
 help() {
 script_name="$(basename $0)"
@@ -21,6 +21,7 @@ generate_env() {
 cat<<ENV > .env
 FENDERMINT_IMAGE=${fendermint_image}
 COMETBFT_IMAGE=${cometbft_image}
+FM_NETWORK: "${network}"
 # chain name
 FM_CHAIN_NAME="${subnet_name}"
 # Subnet ID to connect to
@@ -62,7 +63,7 @@ while (($#)); do
   --env)
     env="$2"
     case "$env" in
-    dar|test) shift 2 ;;
+    dar|kras) shift 2 ;;
     *)
       echo "Unknown env '$2'."
       help
@@ -104,14 +105,14 @@ case "$env" in
     echo TODO
     exit
   ;;
-  test)
-    # TODO pulling of contract addresses
-    parent_gateway="0x097AcfFF25367aDa2C5110E9005f51E0E9685B3B"
-    parent_registry="0xC5d8156A7021Eb1d9429aC91Ed6F4656F225a435"
-    parent_endpoint="https://api.calibration.node.glif.io/rpc/v1"
-    fendermint_seed="/dns4/fendermint.${env}.fluence.dev/tcp/26659/p2p/16Uiu2HAmQKdy7X6KRK2fAoMwVEdozfGSLwDQK15ptfTJRfKXqMwz"
-    cometbft_seeds="2e1c1b8fd010d0e4dbbb00fb1c2b810587d95323@cometbft.${env}.fluence.dev:26656"
+  kras)
+    parent_gateway="0x5cFA791d5c1b162216309fba6fc2A68758A3b233"
+    parent_registry="0xe0B7D47e3f0443e8DC6cA6F84c75F65Cb3a29676"
+    parent_endpoint="https://api.node.glif.io"
+    fendermint_seed="/dns4/fendermint.${env}.fluence.dev/tcp/26659/p2p/16Uiu2HAm28XJzUQmHqeNtPVo2DHengr8RTPuq5mqqq5a2cwKFPLa"
+    cometbft_seeds="7342effaa0f6956fe7161037804e6e931d8e88a3@cometbft.${env}.fluence.dev:26656"
     cometbft_sync="https://cometbft.${env}.fluence.dev:443,https://cometbft.${env}.fluence.dev:443"
+    network="mainnet"
   ;;
 esac
 
@@ -137,18 +138,18 @@ echo "Generating fendermint key"
 docker run --rm --user ${UID} -v ./keys:/keys ${fendermint_image} key gen --out-dir /keys/ --name fendermint
 
 echo "Generating validator key"
-validator_address=$(docker run --rm --user ${UID} -v ./ipc-cli:/ipc ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet new --wallet-type evm | tr -d \")
-validator_public=$(docker run --rm --user ${UID} -v ./ipc-cli:/ipc ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet pub-key --wallet-type evm --address ${validator_address})
-validator_private=$(docker run --rm --user ${UID} -v ./ipc-cli:/ipc -v ./keys:/keys ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet export --wallet-type evm --address ${validator_address} --hex)
+validator_address=$(docker run --rm --user ${UID} -e IPC_NETWORK=${network} -v ./ipc-cli:/ipc ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet new --wallet-type evm | tr -d \")
+validator_public=$(docker run --rm --user ${UID} -e IPC_NETWORK=${network} -v ./ipc-cli:/ipc ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet pub-key --wallet-type evm --address ${validator_address})
+validator_private=$(docker run --rm --user ${UID} -e IPC_NETWORK=${network} -v ./ipc-cli:/ipc -v ./keys:/keys ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet export --wallet-type evm --address ${validator_address} --hex)
 echo $validator_address > ./keys/validator.address
 echo $validator_public > ./keys/validator.pk.hex
 echo $validator_private > ./keys/validator.sk.hex
 
 echo "Converting validator key to fendermint format"
-docker run --rm --user ${UID} -v ./keys:/keys ${fendermint_image} key eth-to-fendermint --secret-key /keys/validator.sk.hex --name validator --out-dir /keys
+docker run --rm --user ${UID} -e FM_NETWORK=${network} -v ./keys:/keys ${fendermint_image} key eth-to-fendermint --secret-key /keys/validator.sk.hex --name validator --out-dir /keys
 
 echo "Converting validator key to cometbft format"
-docker run --rm --user ${UID} -v ./keys:/keys ${fendermint_image} key into-tendermint --secret-key /keys/validator.sk --out /keys/priv_validator_key.json
+docker run --rm --user ${UID} -e FM_NETWORK=${network }-v ./keys:/keys ${fendermint_image} key into-tendermint --secret-key /keys/validator.sk --out /keys/priv_validator_key.json
 
 cat <<FINISH
 

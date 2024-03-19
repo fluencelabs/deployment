@@ -83,7 +83,7 @@ services:
       test: |
         curl -s -X POST 'http://localhost:8545' -H 'Content-Type: application/json' \
           --data '{"jsonrpc":"2.0", "method":"eth_chainId", "params":[], "id":1}' \
-          | jq -e '.result != null'
+          | jq -e '.result == null'
       interval: 8s
       timeout: 10s
       retries: 20

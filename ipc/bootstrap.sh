@@ -5,7 +5,7 @@
 set -euo pipefail
 
 cometbft_image="cometbft/cometbft:v0.37.x"
-fendermint_image="fluencelabs/fendermint:debug"
+fendermint_image="fluencelabs/fendermint:latest"
 
 help() {
 script_name="$(basename $0)"
@@ -130,6 +130,16 @@ generate_env
 if [[ -f ./keys/validator.sk ]]; then
   echo "Seems like validator key was already generated."
   echo "If you want to regenerate it cleanup ./keys directory and rerun the script."
+cat <<FINISH
+
+Subnet ID is ${subnet_id}
+File with configuration options was regenerated at .env
+
+Please share validator address and public key with Fluence team:
+  address: $(cat keys/validator.address)
+  public key: $( cat keys/validator.pk.hex)
+You can also find them at './keys/validator.address' and './keys/validator.pk.hex'
+FINISH
   exit 0
 fi
 

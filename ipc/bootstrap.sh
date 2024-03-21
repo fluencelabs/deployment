@@ -13,7 +13,7 @@ cat <<HELP
 Usage: ${script_name} --env <ENV> --name <NAME> --ip <IP>
 Bootstrap IPC validator node.
 
-  --env   Environment where to run validator. Only dar is allowed for now
+  --env   Environment where to run validator. Only kras is allowed for now
   --name  Human readable validator name.
   --ip    IP address where IPC p2p is accessible from the internet
 HELP
@@ -23,7 +23,7 @@ generate_env() {
 cat<<ENV > .env
 FENDERMINT_IMAGE=${fendermint_image}
 COMETBFT_IMAGE=${cometbft_image}
-FM_NETWORK: "${network}"
+FM_NETWORK="${network}"
 # chain name
 FM_CHAIN_NAME="${subnet_name}"
 # Subnet ID to connect to
@@ -108,8 +108,8 @@ case "$env" in
     exit
   ;;
   kras)
-    parent_gateway="0x5cFA791d5c1b162216309fba6fc2A68758A3b233"
-    parent_registry="0xe0B7D47e3f0443e8DC6cA6F84c75F65Cb3a29676"
+    parent_registry="0xeA6D2165FabB854161915Dc8c9a5E629E06d04f0"
+    parent_gateway="0x01d3B60943509e4232683E6E28527F3f49811C90"
     parent_endpoint="https://api.node.glif.io"
     fendermint_seed="/dns4/fendermint.${env}.fluence.dev/tcp/26659/p2p/16Uiu2HAm28XJzUQmHqeNtPVo2DHengr8RTPuq5mqqq5a2cwKFPLa"
     cometbft_seeds="7342effaa0f6956fe7161037804e6e931d8e88a3@cometbft.${env}.fluence.dev:26656"
@@ -120,8 +120,18 @@ esac
 
 subnet_id="$(curl -s -f https://cometbft.${env}.fluence.dev/genesis | jq .result.genesis.app_state.chain_name -r)"
 subnet_name="${subnet_id#/r*/}"
-read trust_height trust_hash <<<$(curl -s -f https://cometbft.${env}.fluence.dev/commit | jq -r '.result.signed_header.header.height + " " + .result.signed_header.commit.block_id.hash')
+echo "Subnet id is $subnet_id"
 
+read trust_height trust_hash <<<$(curl -s -f https://cometbft.${env}.fluence.dev/commit | jq -r '.result.signed_header.header.height + " " + .result.signed_header.commit.block_id.hash')
+echo "Latest block is $trust_height with hash $trust_hash"
+
+echo "Pulling $fendermint_image"
+docker pull -q ${fendermint_image}
+
+echo "Pulling $cometbft_image"
+docker pull -q ${cometbft_image}
+
+echo "Downloading genesis file to cometbft/config/genesis.json"
 curl -s -f https://cometbft.${env}.fluence.dev/genesis | jq .result.genesis > cometbft/config/genesis.json
 
 generate_env
@@ -143,10 +153,7 @@ FINISH
   exit 0
 fi
 
-echo "Pulling fendermint container image"
-docker pull ${fendermint_image}
-
-echo "Generating fendermint key"
+echo "Generating fendermint network key"
 docker run --rm --user ${UID} -v ./keys:/keys ${fendermint_image} key gen --out-dir /keys/ --name fendermint
 
 echo "Generating validator key"
@@ -156,7 +163,7 @@ validator_private=$(docker run --rm --user ${UID} -e IPC_NETWORK=${network} -v .
 echo $validator_address > ./keys/validator.address
 echo $validator_public > ./keys/validator.pk.hex
 echo $validator_private > ./keys/validator.sk.hex
-cat << KEY > ./cometbft/config/priv_validator_key_state.json
+cat << KEY > ./cometbft/data/priv_validator_key_state.json
 {
   "height": "0",
   "round": 0,

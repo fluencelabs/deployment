@@ -41,7 +41,7 @@ services:
       CMT_NODE_KEY_FILE: "/cometbft/keys/node_key.json"
       CMT_GENESIS_FILE: "/cometbft/config/genesis.json"
       CMT_PRIV_VALIDATOR_KEY_FILE: "/cometbft/keys/priv_validator_key.json"
-      CMT_PRIV_VALIDATOR_STATE_FILE: "/cometbft/config/priv_validator_key_state.json"
+      CMT_PRIV_VALIDATOR_STATE_FILE: "/cometbft/data/priv_validator_key_state.json"
       CMT_DB_DIR: "/cometbft/data/db"
       CMT_PROXY_APP: "tcp://fendermint:26658"
       CMT_P2P_LADDR: "tcp://0.0.0.0:26656"

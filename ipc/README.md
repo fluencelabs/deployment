@@ -24,7 +24,7 @@ docker compose up -d
 
 ## Cleanup
 
-Delete contents of data and snapshots directories. Must be run with sudo right
+Delete contents of data and snapshots directories. Must be run with sudo rights
 since IPC runs as root and files on local fs are owned by root:
 
 ```shell

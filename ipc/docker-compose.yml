@@ -11,7 +11,7 @@ services:
       FM_RESOLVER__NETWORK__LOCAL_KEY: "/fendermint/keys/fendermint.sk"
       FM_VALIDATOR_KEY__PATH: "/fendermint/keys/validator.sk"
       FM_VALIDATOR_KEY__KIND: "ethereum"
-      FM_SNAPSHOTS__ENABLED: true
+      FM_SNAPSHOTS__ENABLED: "true"
       FM_IPC__TOPDOWN__CHAIN_HEAD_DELAY: "10"
       FM_IPC__TOPDOWN__EXPONENTIAL_BACK_OFF: "5"
       FM_IPC__TOPDOWN__EXPONENTIAL_RETRY_LIMIT: "5"
@@ -46,11 +46,11 @@ services:
       CMT_PROXY_APP: "tcp://fendermint:26658"
       CMT_P2P_LADDR: "tcp://0.0.0.0:26656"
       CMT_RPC_LADDR: "tcp://0.0.0.0:26657"
-      CMT_P2P_PEX: true
-      CMT_P2P_SEED_MODE: false
+      CMT_P2P_PEX: "true"
+      CMT_P2P_SEED_MODE: "false"
       CMT_P2P_ADDR_BOOK_FILE: "/cometbft/data/addrbook.json"
-      CMT_P2P_ADDR_BOOK_STRICT: true
-      CMT_STATESYNC_ENABLE: true
+      CMT_P2P_ADDR_BOOK_STRICT: "true"
+      CMT_STATESYNC_ENABLE: "true"
     env_file:
       - .env
     expose:

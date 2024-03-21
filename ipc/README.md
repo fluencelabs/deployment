@@ -2,7 +2,7 @@
 
 ## Prepare
 
-Pull configure IPC, pull genesis file, create keys with one command:
+Get IPC parameters, pull genesis file, create keys with one command:
 
 ```shell
 ./boostrap.sh --env ENV --name NAME --ip IP
@@ -21,6 +21,20 @@ See `./boostrap.sh -h` for more info.
 ```shell
 docker compose up -d
 ```
+
+## Cleanup
+
+Delete contents of data and snapshots directories. Must be run with sudo right
+since IPC runs as root and files on local fs are owned by root:
+
+```shell
+docker compose down
+sudo rm -r cometbft/data/* fendermint/data/* fendermint/snapshots/*
+```
+
+Optionally you can delete contents of `keys/` directory. When you run
+`bootstrap.sh` next time new pair of keys will be generated. Otherwise the keys
+from previous deployment will be reused.
 
 ## Structure
 

@@ -1,6 +1,9 @@
-# Nox deployments
+# Deployment packages and examples
 
-Nox deployment packages and examples.
+## Nox
 
-- [docker-compose](docker-compose)
 - [ansible](ansible)
+
+## IPC
+
+- [ipc](ipc) - IPC validator node with docker-compose

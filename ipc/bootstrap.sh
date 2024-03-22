@@ -56,7 +56,7 @@ CMT_STATESYNC_TRUST_HASH="${trust_hash}"
 ENV
 }
 
-init_key_state {
+init_key_state() {
 cat << KEY > ./cometbft/data/priv_validator_key_state.json
 {
   "height": "0",

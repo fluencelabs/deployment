@@ -56,6 +56,16 @@ CMT_STATESYNC_TRUST_HASH="${trust_hash}"
 ENV
 }
 
+init_key_state {
+cat << KEY > ./cometbft/data/priv_validator_key_state.json
+{
+  "height": "0",
+  "round": 0,
+  "step": 0
+}
+KEY
+}
+
 # Print help if no arguments provided
 ! (($#)) && help && exit 0
 
@@ -140,6 +150,9 @@ generate_env
 if [[ -f ./keys/validator.sk ]]; then
   echo "Seems like validator key was already generated."
   echo "If you want to regenerate it cleanup ./keys directory and rerun the script."
+  if ! [[ -f ./cometbft/data/priv_validator_key_state.json ]]; then
+    init_key_state
+  fi
 cat <<FINISH
 
 Subnet ID is ${subnet_id}
@@ -163,13 +176,7 @@ validator_private=$(docker run --rm --user ${UID} -e IPC_NETWORK=${network} -v .
 echo $validator_address > ./keys/validator.address
 echo $validator_public > ./keys/validator.pk.hex
 echo $validator_private > ./keys/validator.sk.hex
-cat << KEY > ./cometbft/data/priv_validator_key_state.json
-{
-  "height": "0",
-  "round": 0,
-  "step": 0
-}
-KEY
+init_key_state
 
 echo "Converting validator key to fendermint format"
 docker run --rm --user ${UID} -e FM_NETWORK=${network} -v ./keys:/keys ${fendermint_image} key eth-to-fendermint --secret-key /keys/validator.sk.hex --name validator --out-dir /keys

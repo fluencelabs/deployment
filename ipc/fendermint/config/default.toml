@@ -173,6 +173,8 @@ max_provider_age = 300
 # Leaving it empty disables the IPLD Resolver.
 listen_addr = ""
 
+external_addresses = []
+
 # Maximum number of incoming connections.
 max_incoming = 30
 

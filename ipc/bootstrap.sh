@@ -5,7 +5,7 @@
 set -euo pipefail
 
 cometbft_image="cometbft/cometbft:v0.37.x"
-fendermint_image="fluencelabs/fendermint:latest"
+fendermint_image="fluencelabs/fendermint:kras"
 
 help() {
 script_name="$(basename $0)"
@@ -13,7 +13,7 @@ cat <<HELP
 Usage: ${script_name} --env <ENV> --name <NAME> --ip <IP>
 Bootstrap IPC validator node.
 
-  --env   Environment where to run validator. Only kras is allowed for now
+  --env   Environment where to run validator. Only kras and dar is allowed for now
   --name  Human readable validator name.
   --ip    IP address where IPC p2p is accessible from the internet
 HELP
@@ -36,6 +36,8 @@ FM_IPC__TOPDOWN__PARENT_REGISTRY="${parent_registry}"
 FM_IPC__TOPDOWN__PARENT_HTTP_ENDPOINT="${parent_endpoint}"
 # Address of a seed fendermint node
 FM_RESOLVER__DISCOVERY__STATIC_ADDRESSES="${fendermint_seed}"
+# Extrenal address of fendermint node
+FM_RESOLVER__CONNECTION__EXTERNAL_ADDRESSES="${ip}:26659"
 # fendermint gossip network name
 FM_RESOLVER__NETWORK__NETWORK_NAME="${subnet_name}"
 # Our subnet should never be flushed
@@ -114,8 +116,13 @@ done
 # set variables according to environment
 case "$env" in
   dar)
-    echo TODO
-    exit
+    parent_registry="0xe467a4C4dA5c26780ed693E8984d888Ec2D05DE1"
+    parent_gateway="0x5Db62f5479c80f1aE217AE447C6F704D56B4608C"
+    parent_endpoint="https://api.calibration.node.glif.io/rpc/v1"
+    fendermint_seed="/dns4/fendermint.${env}.fluence.dev/tcp/26659/p2p/16Uiu2HAmSjFKY6VoE2YEgAHGGEiR6YGSvguMQdcTyVJGZ7U6UCbw"
+    cometbft_seeds="0ca1c5d56ca3d4e79dd92c87ab172a3e5eb806b5@cometbft.${env}.fluence.dev:26656"
+    cometbft_sync="https://cometbft.${env}.fluence.dev:443,https://cometbft.${env}.fluence.dev:443"
+    network="testnet"
   ;;
   kras)
     parent_registry="0xeA6D2165FabB854161915Dc8c9a5E629E06d04f0"

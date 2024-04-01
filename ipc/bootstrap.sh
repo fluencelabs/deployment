@@ -13,7 +13,7 @@ cat <<HELP
 Usage: ${script_name} --env <ENV> --name <NAME> --ip <IP>
 Bootstrap IPC validator node.
 
-  --env   Environment where to run validator. Only kras and dar is allowed for now
+  --env   Environment where to run validator. Only kras and dar are allowed for now
   --name  Human readable validator name.
   --ip    IP address where IPC p2p is accessible from the internet
 HELP

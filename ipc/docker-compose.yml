@@ -51,6 +51,9 @@ services:
       CMT_P2P_ADDR_BOOK_FILE: "/cometbft/data/addrbook.json"
       CMT_P2P_ADDR_BOOK_STRICT: "true"
       CMT_STATESYNC_ENABLE: "true"
+      CMT_CONSENSUS_CREATE_EMPTY_BLOCKS: true
+      CMT_CONSENSUS_CREATE_EMPTY_BLOCKS_INTERVAL: "10s"
+      CMT_CONSENSUS_TIMEOUT_COMMIT: "10s"
     env_file:
       - .env
     expose:

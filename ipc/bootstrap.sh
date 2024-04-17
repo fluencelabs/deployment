@@ -10,12 +10,13 @@ fendermint_image="fluencelabs/fendermint:kras"
 help() {
 script_name="$(basename $0)"
 cat <<HELP
-Usage: ${script_name} --env <ENV> --name <NAME> --ip <IP>
+Usage: ${script_name} --env <ENV> --name <NAME> --ip <IP> --halt-height <HEIGHT>
 Bootstrap IPC validator node.
 
-  --env   Environment where to run validator. Only kras and dar are allowed for now
-  --name  Human readable validator name.
-  --ip    IP address where IPC p2p is accessible from the internet
+  --env          Environment where to run validator. Only kras and dar are allowed for now
+  --name         Human readable validator name.
+  --ip           IP address where IPC p2p is accessible from the internet
+  --halt-height  Height at which stop to produce blocks
 HELP
 }
 
@@ -24,6 +25,7 @@ cat<<ENV > .env
 FENDERMINT_IMAGE=${fendermint_image}
 COMETBFT_IMAGE=${cometbft_image}
 FM_NETWORK="${network}"
+FM_HALT_HEIGHT="${halt_height:-0}"
 # chain name
 FM_CHAIN_NAME="${subnet_name}"
 # Subnet ID to connect to
@@ -99,6 +101,10 @@ while (($#)); do
       echo "$name is invalid. Only [a-zA-Z0-9_-] are allowed"
       exit 1
     fi
+    shift 2
+    ;;
+  --halt-height)
+    halt_height="$2"
     shift 2
     ;;
   -h|--help)

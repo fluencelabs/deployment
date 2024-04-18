@@ -14,6 +14,12 @@ services:
       FM_VALIDATOR_KEY__PATH: "/fendermint/keys/validator.sk"
       FM_VALIDATOR_KEY__KIND: "ethereum"
       FM_SNAPSHOTS__ENABLED: "true"
+      FM_IPC__TOPDOWN__CHAIN_HEAD_DELAY: "10"
+      FM_IPC__TOPDOWN__EXPONENTIAL_BACK_OFF: "5"
+      FM_IPC__TOPDOWN__EXPONENTIAL_RETRY_LIMIT: "5"
+      FM_IPC__TOPDOWN__POLLING_INTERVAL: "10"
+      FM_IPC__TOPDOWN__PROPOSAL_DELAY: "2"
+      FM_IPC__TOPDOWN__MAX_PROPOSAL_RANGE: "100"
     env_file:
       - .env
     expose:

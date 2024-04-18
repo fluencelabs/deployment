@@ -5,7 +5,7 @@
 set -euo pipefail
 
 cometbft_image="cometbft/cometbft:v0.37.x"
-fendermint_image="fluencelabs/fendermint:kras"
+fendermint_image="fluencelabs/fendermint:recover"
 
 help() {
 script_name="$(basename $0)"

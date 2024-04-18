@@ -6,18 +6,14 @@ services:
       LOG_LEVEL: "info"
       FM_TENDERMINT_RPC_URL: "http://cometbft:26657"
       FM_RESOLVER__CONNECTION__LISTEN_ADDR: "/ip4/0.0.0.0/tcp/26659"
+      FLUENCE_UPGRADE_01_HEIGHT: 219400
+      FM_CONFIG_DIR: "/fendermint/config"
       FM_ABCI__LISTEN__HOST: "0.0.0.0"
       FM_ABCI__LISTEN__PORT: "26658"
       FM_RESOLVER__NETWORK__LOCAL_KEY: "/fendermint/keys/fendermint.sk"
       FM_VALIDATOR_KEY__PATH: "/fendermint/keys/validator.sk"
       FM_VALIDATOR_KEY__KIND: "ethereum"
       FM_SNAPSHOTS__ENABLED: "true"
-      FM_IPC__TOPDOWN__CHAIN_HEAD_DELAY: "10"
-      FM_IPC__TOPDOWN__EXPONENTIAL_BACK_OFF: "5"
-      FM_IPC__TOPDOWN__EXPONENTIAL_RETRY_LIMIT: "5"
-      FM_IPC__TOPDOWN__POLLING_INTERVAL: "10"
-      FM_IPC__TOPDOWN__PROPOSAL_DELAY: "2"
-      FM_IPC__TOPDOWN__MAX_PROPOSAL_RANGE: "100"
     env_file:
       - .env
     expose:
@@ -28,7 +24,6 @@ services:
     volumes:
       - ./fendermint/snapshots:/fendermint/snapshots
       - ./fendermint/data:/fendermint/data
-      - ./fendermint/config:/fendermint/config
       - ./keys:/fendermint/keys
 
   cometbft:
@@ -36,7 +31,6 @@ services:
     user: "root"
     environment:
       CMT_LOG_LEVEL: "info"
-      # CMT_LOG_LEVEL: "*:info,consensus:error,p2p:error"
       CMT_LOG_FORMAT: "plain"
       CMT_NODE_KEY_FILE: "/cometbft/keys/node_key.json"
       CMT_GENESIS_FILE: "/cometbft/config/genesis.json"

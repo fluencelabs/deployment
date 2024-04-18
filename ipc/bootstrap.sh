@@ -31,11 +31,11 @@ FM_CHAIN_NAME="${subnet_name}"
 # Subnet ID to connect to
 FM_IPC__SUBNET_ID="${subnet_id}"
 # Address of gateway contract
-FM_IPC__TOPDOWN__PARENT_GATEWAY="${parent_gateway}"
-# Address of registry contract
-FM_IPC__TOPDOWN__PARENT_REGISTRY="${parent_registry}"
-# Parent chain HTTP endpoint
-FM_IPC__TOPDOWN__PARENT_HTTP_ENDPOINT="${parent_endpoint}"
+# FM_IPC__TOPDOWN__PARENT_GATEWAY="${parent_gateway}"
+# # Address of registry contract
+# FM_IPC__TOPDOWN__PARENT_REGISTRY="${parent_registry}"
+# # Parent chain HTTP endpoint
+# FM_IPC__TOPDOWN__PARENT_HTTP_ENDPOINT="${parent_endpoint}"
 # Address of a seed fendermint node
 FM_RESOLVER__DISCOVERY__STATIC_ADDRESSES="${fendermint_seed}"
 # Extrenal address of fendermint node

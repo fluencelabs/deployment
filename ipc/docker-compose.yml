@@ -6,6 +6,7 @@ services:
       LOG_LEVEL: "info"
       FM_TENDERMINT_RPC_URL: "http://cometbft:26657"
       FM_RESOLVER__CONNECTION__LISTEN_ADDR: "/ip4/0.0.0.0/tcp/26659"
+      FLUENCE_UPGRADE_01_HEIGHT: 219700
       FM_CONFIG_DIR: "/fendermint/config"
       FM_ABCI__LISTEN__HOST: "0.0.0.0"
       FM_ABCI__LISTEN__PORT: "26658"

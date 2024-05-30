@@ -2,5 +2,7 @@
   become: true
   roles:
     - "fluencelabs.provider.nox"
-    # uncomment if you want to ship logs to fluence team
+    # uncomment if you want to ship logs to Cloudless Labs
     # - "fluencelabs.provider.promtail"
+    # uncomment if you want to metrics logs to Cloudless Labs
+    # - "fluencelabs.provider.prometheus"

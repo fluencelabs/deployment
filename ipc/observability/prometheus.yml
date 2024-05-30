@@ -1,0 +1,23 @@
+global:
+  scrape_interval: "15s"
+  external_labels:
+    env: "${FLUENCE_NETWORK}"
+    network: "${FLUENCE_NETWORK}"
+
+remote_write:
+  - url: "https://mimir.fluence.dev"
+    authorization:
+      credentials_file: "/config/credentials"
+
+scrape_configs:
+  - job_name: "cometbft"
+    static_configs:
+      - targets: ["cometbft:26671"]
+        labels:
+          instance: "${FLUENCE_INSTANCE_ID}"
+
+  - job_name: "fendermint"
+    static_configs:
+      - targets: ["fendermint:26670"]
+        labels:
+          instance: "${FLUENCE_INSTANCE_ID}"

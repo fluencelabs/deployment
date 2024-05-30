@@ -1,0 +1,34 @@
+services:
+  prometheus:
+    image: prom/prometheus
+    user: root
+    command:
+      - "--config.file=/configs/prometheus.yml"
+      - "--web.enable-lifecycle"
+      - "--enable-feature=agent,expand-external-labels"
+      - "--storage.agent.path=/data"
+    ports:
+      - 9090:9090
+    volumes:
+      - ./observability/:/configs
+      - prometheus:/data
+    env_file:
+      - .env
+
+  promtail:
+    image: grafana/promtail:2.9.5
+    user: root
+    command:
+      - "-config.file=/configs/promtail.yml"
+      - "-config.expand-env=true"
+    volumes:
+      - ./observability/:/configs
+      - promtail:/data
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - .env
+
+volumes:
+  prometheus:
+  promtail:

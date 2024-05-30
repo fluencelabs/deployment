@@ -6,7 +6,6 @@ services:
       LOG_LEVEL: "info"
       FM_TENDERMINT_RPC_URL: "http://cometbft:26657"
       FM_RESOLVER__CONNECTION__LISTEN_ADDR: "/ip4/0.0.0.0/tcp/26659"
-      FLUENCE_UPGRADE_01_HEIGHT: 219700
       FM_CONFIG_DIR: "/fendermint/config"
       FM_ABCI__LISTEN__HOST: "0.0.0.0"
       FM_ABCI__LISTEN__PORT: "26658"
@@ -20,13 +19,18 @@ services:
       FM_IPC__TOPDOWN__POLLING_INTERVAL: "10"
       FM_IPC__TOPDOWN__PROPOSAL_DELAY: "2"
       FM_IPC__TOPDOWN__MAX_PROPOSAL_RANGE: "100"
+      FM_METRICS__ENABLED: "true"
+      FM_METRICS__LISTEN__HOST: "0.0.0.0"
+      FM_METRICS__LISTEN__PORT: "26670"
     env_file:
       - .env
     expose:
       - 26659 # p2p
       - 26658 # abci
+      - 26670 # metrics
     ports:
       - "26659:26659" # p2p
+      - "26670:26670" # metrics
     volumes:
       - ./fendermint/snapshots:/fendermint/snapshots
       - ./fendermint/data:/fendermint/data
@@ -54,13 +58,16 @@ services:
       CMT_CONSENSUS_CREATE_EMPTY_BLOCKS: "true"
       CMT_CONSENSUS_CREATE_EMPTY_BLOCKS_INTERVAL: "10s"
       CMT_CONSENSUS_TIMEOUT_COMMIT: "10s"
+      CMT_INSTRUMENTATION_PROMETHEUS_LISTEN_ADDR: "0.0.0.0:26671"
     env_file:
       - .env
     expose:
       - 26657 # rpc
       - 26656 # p2p
+      - 26671 # metrics
     ports:
       - "26656:26656" # p2p
+      - "26671:26671" # metrics
     volumes:
       - ./cometbft/data:/cometbft/data
       - ./cometbft/config:/cometbft/config

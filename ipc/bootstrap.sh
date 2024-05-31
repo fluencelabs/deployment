@@ -56,16 +56,11 @@ CMT_STATESYNC_RPC_SERVERS="${cometbft_sync}"
 # Block height to begin state sync from
 CMT_STATESYNC_TRUST_HEIGHT="${trust_height}"
 # Aformentioned block hash
-<<<<<<< HEAD
-# CMT_STATESYNC_TRUST_HASH="${trust_hash}"
-CMT_STATESYNC_TRUST_HASH=4A8218EC6A00B246A28C4E564EEFABE37D5201599D5674E95F3739CF920A3537
+CMT_STATESYNC_TRUST_HASH="${trust_hash}"
 
 # Observability
 FLUENCE_NETWORK="${network}"
 FLUENCE_INSTANCE_ID="${name}"
-=======
-CMT_STATESYNC_TRUST_HASH="${trust_hash}"
->>>>>>> main
 ENV
 }
 

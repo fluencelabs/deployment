@@ -22,6 +22,11 @@ services:
       FM_METRICS__ENABLED: "true"
       FM_METRICS__LISTEN__HOST: "0.0.0.0"
       FM_METRICS__LISTEN__PORT: "26670"
+    labels:
+      prometheus_instance: "${FLUENCE_INSTANCE_ID}"
+      prometheus_port: "26670"
+      prometheus_job: "fendermint"
+      prometheus_scrape: "true"
     env_file:
       - .env
     expose:
@@ -30,7 +35,6 @@ services:
       - 26670 # metrics
     ports:
       - "26659:26659" # p2p
-      - "26670:26670" # metrics
     volumes:
       - ./fendermint/snapshots:/fendermint/snapshots
       - ./fendermint/data:/fendermint/data
@@ -58,7 +62,13 @@ services:
       CMT_CONSENSUS_CREATE_EMPTY_BLOCKS: "true"
       CMT_CONSENSUS_CREATE_EMPTY_BLOCKS_INTERVAL: "10s"
       CMT_CONSENSUS_TIMEOUT_COMMIT: "10s"
+      CMT_INSTRUMENTATION_PROMETHEUS: "true"
       CMT_INSTRUMENTATION_PROMETHEUS_LISTEN_ADDR: "0.0.0.0:26671"
+    labels:
+      prometheus_instance: "${FLUENCE_INSTANCE_ID}"
+      prometheus_port: "26671"
+      prometheus_job: "cometbft"
+      prometheus_scrape: "true"
     env_file:
       - .env
     expose:
@@ -67,7 +77,6 @@ services:
       - 26671 # metrics
     ports:
       - "26656:26656" # p2p
-      - "26671:26671" # metrics
     volumes:
       - ./cometbft/data:/cometbft/data
       - ./cometbft/config:/cometbft/config
@@ -86,6 +95,8 @@ services:
       FM_NETWORK: testnet
       TENDERMINT_RPC_URL: "http://cometbft:26657"
       TENDERMINT_WS_URL: "ws://cometbft:26657/websocket"
+    labels:
+      instance: ${FLUENCE_INSTANCE_ID}
     command: "eth run"
     ports:
       - "8545:8545"
@@ -99,3 +110,42 @@ services:
     depends_on:
       cometbft:
         condition: service_healthy
+
+  prometheus:
+    profiles:
+      - observability
+    image: prom/prometheus
+    user: root
+    command:
+      - "--config.file=/configs/prometheus.yml"
+      - "--web.enable-lifecycle"
+      - "--enable-feature=agent,expand-external-labels"
+      - "--storage.agent.path=/data"
+    ports:
+      - 9090:9090
+    volumes:
+      - ./observability/:/configs
+      - prometheus:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - .env
+
+  promtail:
+    profiles:
+      - observability
+    image: grafana/promtail:2.9.5
+    user: root
+    command:
+      - "-config.file=/configs/promtail.yml"
+      - "-config.expand-env=true"
+    volumes:
+      - ./observability/:/configs
+      - promtail:/data
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - .env
+
+volumes:
+  prometheus:
+  promtail:

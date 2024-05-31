@@ -5,7 +5,7 @@
 Get IPC parameters, pull genesis file, create keys with one command:
 
 ```shell
-./boostrap.sh --env ENV --name NAME --ip IP
+./boostrap.sh --network NETWORK --name NAME --ip IP
 ```
 
 See `./boostrap.sh -h` for more info.
@@ -20,6 +20,13 @@ See `./boostrap.sh -h` for more info.
 
 ```shell
 docker compose up -d
+```
+
+## Run with observabiliy stack
+
+```shell
+./boostrap.sh --network NETWORK --name NAME --ip IP --basicauth_username USERNAME --basicauth_password PASSWORD
+docker compose --profile observability up -d
 ```
 
 ## Cleanup

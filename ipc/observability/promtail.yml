@@ -7,8 +7,9 @@ clients:
       instance: "${FLUENCE_INSTANCE_ID}"
       env: "${FLUENCE_NETWORK}"
       network: "${FLUENCE_NETWORK}"
-    authorization:
-      credentials_file: "/config/credentials"
+    basic_auth:
+      username: test
+      password: 1vngmIaFdSHxEEHU
 
 scrape_configs:
   - job_name: "cometbft"
@@ -16,8 +17,10 @@ scrape_configs:
       - host: unix:///var/run/docker.sock
         filters:
           - name: label
-            values: ["name=cometbft"]
+            values: ["prometheus_job=cometbft"]
     pipeline_stages:
+      - multiline:
+          firstline: '^(?P<level>[A-Z])\[(?P<timestamp>[^\]]+)\].*'
       - regex:
           expression: '^(?P<level>[A-Z])\[(?P<timestamp>[^\]]+)\] (?P<message>.*)$'
       - timestamp:
@@ -37,14 +40,19 @@ scrape_configs:
             {{- end -}}
       - labels:
           level: level
+    relabel_configs:
+      - source_labels: [__meta_docker_container_label_prometheus_job]
+        target_label: job
 
   - job_name: "fendemint"
     docker_sd_configs:
       - host: unix:///var/run/docker.sock
         filters:
           - name: label
-            values: ["name=fendermint"]
+            values: ["prometheus_job=fendermint"]
     pipeline_stages:
+      - multiline:
+          firstline: '^(?P<timestamp>[^ ]+).*'
       - regex:
           expression: '^(?P<timestamp>[^ ]+) (?P<level>[A-Z]+)'
       - timestamp:
@@ -64,19 +72,6 @@ scrape_configs:
             {{- end -}}
       - labels:
           level:
-      - drop:
-          expression: ".* listening for requests"
-          drop_counter_reason: "noise"
-
-  - job_name: "eth-api"
-    docker_sd_configs:
-      - host: unix:///var/run/docker.sock
-        filters:
-          - name: label
-            values: ["name=eth-api"]
-    pipeline_stages:
-      - regex:
-          expression: '^(?P<timestamp>[^ ]+) (?P<level>[A-Z]+)'
-      - timestamp:
-          source: timestamp
-          format: 'RFC3339'
+    relabel_configs:
+      - source_labels: [__meta_docker_container_label_prometheus_job]
+        target_label: job

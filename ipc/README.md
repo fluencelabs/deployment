@@ -24,6 +24,8 @@ docker compose up -d
 
 ## Run with observabiliy stack
 
+In order to run observability stack you should get basic auth from Cloudless labs.
+
 ```shell
 ./boostrap.sh --network NETWORK --name NAME --ip IP --basicauth_username USERNAME --basicauth_password PASSWORD
 docker compose --profile observability up -d
@@ -68,5 +70,6 @@ from previous deployment will be reused.
 │   ├── validator.pk.hex        # validator publick key in hex format
 │   ├── validator.sk            # validator secret key
 │   └── validator.sk.hex        # validator secret key in hex format
+├── observability               # config files for observability services
 └── README.md
 ```

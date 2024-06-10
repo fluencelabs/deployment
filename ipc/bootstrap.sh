@@ -11,7 +11,7 @@ help() {
 Usage: ${script_name} --network <ENV> --name <NAME> --ip <IP> --halt-height <HEIGHT>
 Bootstrap IPC validator node.
 
-  --network            Environment where to run validator. Only kras and dar are allowed for now
+  --network            Environment where to run validator. Possible values: kras for mainnet, dar for testnet
   --name               Human readable validator name that will appear in logs and metrics
   --ip                 IP address where IPC p2p is accessible from the internet
   --halt-height        Height at which stop to produce blocks

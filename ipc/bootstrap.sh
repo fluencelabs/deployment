@@ -11,7 +11,7 @@ help() {
 Usage: ${script_name} --network <ENV> --name <NAME> --ip <IP> --halt-height <HEIGHT>
 Bootstrap IPC validator node.
 
-  --env | --network    Environment where to run validator. Only kras and dar are allowed for now
+  --network            Environment where to run validator. Only kras and dar are allowed for now
   --name               Human readable validator name that will appear in logs and metrics
   --ip                 IP address where IPC p2p is accessible from the internet
   --halt-height        Height at which stop to produce blocks
@@ -87,7 +87,7 @@ generate_basicauth() {
 # Parse script arguments
 while (($#)); do
   case "$1" in
-  --env)
+  --env|--network)
     env="$2"
     network="$2"
     case "$network" in

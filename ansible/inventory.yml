@@ -17,3 +17,5 @@ all:
         # Set only if you want to ship logs/metrics to Cloudless labs
         # fluence_basicauth_username: "<username>"
         # fluence_basicauth_password: "<password>"
+        # fluence_promtail_version: "2.9.5"
+        # fluence_prometheus_version: "2.52.0"

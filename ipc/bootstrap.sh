@@ -153,7 +153,7 @@ dar)
 kras)
   parent_registry="0xeA6D2165FabB854161915Dc8c9a5E629E06d04f0"
   parent_gateway="0x01d3B60943509e4232683E6E28527F3f49811C90"
-  parent_endpoint="https://api.node.glif.io/rpc/v1"
+  parent_endpoint="https://gerovit.filmine.dev/rpc/v1"
   fendermint_seed="/dns4/fendermint.${network}.fluence.dev/tcp/26659/p2p/16Uiu2HAm28XJzUQmHqeNtPVo2DHengr8RTPuq5mqqq5a2cwKFPLa"
   cometbft_seeds="7342effaa0f6956fe7161037804e6e931d8e88a3@cometbft.${network}.fluence.dev:26656"
   cometbft_sync="https://cometbft.${network}.fluence.dev:443,https://cometbft.${network}.fluence.dev:443"

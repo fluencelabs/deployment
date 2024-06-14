@@ -1,30 +1,30 @@
 #! /usr/bin/env bash
 
-# set -x
-
-set -euo pipefail
+set -eo pipefail
 
 cometbft_image="cometbft/cometbft:v0.37.x"
 fendermint_image="fluencelabs/fendermint:kras-boh-2"
 
 help() {
-script_name="$(basename $0)"
-cat <<HELP
-Usage: ${script_name} --env <ENV> --name <NAME> --ip <IP> --halt-height <HEIGHT>
+  script_name="$(basename $0)"
+  cat <<HELP
+Usage: ${script_name} --network <ENV> --name <NAME> --ip <IP> --halt-height <HEIGHT>
 Bootstrap IPC validator node.
 
-  --env          Environment where to run validator. Only kras and dar are allowed for now
-  --name         Human readable validator name.
-  --ip           IP address where IPC p2p is accessible from the internet
-  --halt-height  Height at which stop to produce blocks
+  --network            Environment where to run validator. Possible values: kras for mainnet, dar for testnet
+  --name               Human readable validator name that will appear in logs and metrics
+  --ip                 IP address where IPC p2p is accessible from the internet
+  --halt-height        Height at which stop to produce blocks
+  --basicauth_username observability basicauth username
+  --basicauth_password obserbability basicauth password
 HELP
 }
 
 generate_env() {
-cat<<ENV > .env
+  cat <<ENV >.env
 FENDERMINT_IMAGE=${fendermint_image}
 COMETBFT_IMAGE=${cometbft_image}
-FM_NETWORK="${network}"
+FM_NETWORK="${fm_network}"
 FM_HALT_HEIGHT="${halt_height:-0}"
 # chain name
 FM_CHAIN_NAME="${subnet_name}"
@@ -57,11 +57,15 @@ CMT_STATESYNC_RPC_SERVERS="${cometbft_sync}"
 CMT_STATESYNC_TRUST_HEIGHT="${trust_height}"
 # Aformentioned block hash
 CMT_STATESYNC_TRUST_HASH="${trust_hash}"
+
+# Observability
+FLUENCE_NETWORK="${network}"
+FLUENCE_INSTANCE_ID="${name}"
 ENV
 }
 
 init_key_state() {
-cat << KEY > ./cometbft/data/priv_validator_key_state.json
+  cat <<KEY >./cometbft/data/priv_validator_key_state.json
 {
   "height": "0",
   "round": 0,
@@ -70,18 +74,26 @@ cat << KEY > ./cometbft/data/priv_validator_key_state.json
 KEY
 }
 
+generate_basicauth() {
+  if ! [[ -z ${basicauth_username} ]]; then
+    sed -i "s/^\([[:space:]]*username: \).*/\1${basicauth_username}/" observability/prometheus.yml observability/promtail.yml
+    sed -i "s/^\([[:space:]]*password: \).*/\1${basicauth_password}/" observability/prometheus.yml observability/promtail.yml
+  fi
+}
+
 # Print help if no arguments provided
 ! (($#)) && help && exit 0
 
 # Parse script arguments
 while (($#)); do
   case "$1" in
-  --env)
+  --env|--network)
     env="$2"
-    case "$env" in
-    dar|kras) shift 2 ;;
+    network="$2"
+    case "$network" in
+    dar | kras) shift 2 ;;
     *)
-      echo "Unknown env '$2'."
+      echo "Unknown network '$2'."
       help
       exit 1
       ;;
@@ -107,7 +119,15 @@ while (($#)); do
     halt_height="$2"
     shift 2
     ;;
-  -h|--help)
+  --basicauth_username)
+    basicauth_username="$2"
+    shift 2
+    ;;
+  --basicauth_password)
+    basicauth_password="$2"
+    shift 2
+    ;;
+  -h | --help)
     help
     exit 0
     ;;
@@ -119,34 +139,33 @@ while (($#)); do
   esac
 done
 
-# set variables according to environment
-case "$env" in
-  dar)
-    parent_registry="0xe467a4C4dA5c26780ed693E8984d888Ec2D05DE1"
-    parent_gateway="0x5Db62f5479c80f1aE217AE447C6F704D56B4608C"
-    parent_endpoint="https://api.calibration.node.glif.io/rpc/v1"
-    fendermint_seed="/dns4/fendermint.${env}.fluence.dev/tcp/26659/p2p/16Uiu2HAmSjFKY6VoE2YEgAHGGEiR6YGSvguMQdcTyVJGZ7U6UCbw"
-    cometbft_seeds="0ca1c5d56ca3d4e79dd92c87ab172a3e5eb806b5@cometbft.${env}.fluence.dev:26656"
-    cometbft_sync="https://cometbft.${env}.fluence.dev:443,https://cometbft.${env}.fluence.dev:443"
-    network="testnet"
+# set variables according to network
+case "$network" in
+dar)
+  parent_registry="0xe467a4C4dA5c26780ed693E8984d888Ec2D05DE1"
+  parent_gateway="0x5Db62f5479c80f1aE217AE447C6F704D56B4608C"
+  parent_endpoint="https://api.calibration.node.glif.io/rpc/v1"
+  fendermint_seed="/dns4/fendermint.${network}.fluence.dev/tcp/26659/p2p/16Uiu2HAmSjFKY6VoE2YEgAHGGEiR6YGSvguMQdcTyVJGZ7U6UCbw"
+  cometbft_seeds="0ca1c5d56ca3d4e79dd92c87ab172a3e5eb806b5@cometbft.${network}.fluence.dev:26656"
+  cometbft_sync="https://cometbft.${network}.fluence.dev:443,https://cometbft.${network}.fluence.dev:443"
+  fm_network="testnet"
   ;;
-  kras)
-    parent_registry="0xeA6D2165FabB854161915Dc8c9a5E629E06d04f0"
-    parent_gateway="0x01d3B60943509e4232683E6E28527F3f49811C90"
-    # parent_endpoint="https://api.node.glif.io"
-    parent_endpoint="https://gerovit.filmine.dev/rpc/v1"
-    fendermint_seed="/dns4/fendermint.${env}.fluence.dev/tcp/26659/p2p/16Uiu2HAm28XJzUQmHqeNtPVo2DHengr8RTPuq5mqqq5a2cwKFPLa"
-    cometbft_seeds="7342effaa0f6956fe7161037804e6e931d8e88a3@cometbft.${env}.fluence.dev:26656"
-    cometbft_sync="https://cometbft.${env}.fluence.dev:443,https://cometbft.${env}.fluence.dev:443"
-    network="mainnet"
+kras)
+  parent_registry="0xeA6D2165FabB854161915Dc8c9a5E629E06d04f0"
+  parent_gateway="0x01d3B60943509e4232683E6E28527F3f49811C90"
+  parent_endpoint="https://api.node.glif.io/rpc/v1"
+  fendermint_seed="/dns4/fendermint.${network}.fluence.dev/tcp/26659/p2p/16Uiu2HAm28XJzUQmHqeNtPVo2DHengr8RTPuq5mqqq5a2cwKFPLa"
+  cometbft_seeds="7342effaa0f6956fe7161037804e6e931d8e88a3@cometbft.${network}.fluence.dev:26656"
+  cometbft_sync="https://cometbft.${network}.fluence.dev:443,https://cometbft.${network}.fluence.dev:443"
+  fm_network="mainnet"
   ;;
 esac
 
-subnet_id="$(curl -s -f https://cometbft.${env}.fluence.dev/genesis | jq .result.genesis.app_state.chain_name -r)"
+subnet_id="$(curl -s -f https://cometbft.${network}.fluence.dev/genesis | jq .result.genesis.app_state.chain_name -r)"
 subnet_name="${subnet_id#/r*/}"
 echo "Subnet id is $subnet_id"
 
-read trust_height trust_hash <<<$(curl -s -f https://cometbft.${env}.fluence.dev/commit | jq -r '.result.signed_header.header.height + " " + .result.signed_header.commit.block_id.hash')
+read trust_height trust_hash <<<$(curl -s -f https://cometbft.${network}.fluence.dev/commit | jq -r '.result.signed_header.header.height + " " + .result.signed_header.commit.block_id.hash')
 echo "Latest block is $trust_height with hash $trust_hash"
 
 echo "Pulling $fendermint_image"
@@ -156,9 +175,10 @@ echo "Pulling $cometbft_image"
 docker pull -q ${cometbft_image}
 
 echo "Downloading genesis file to cometbft/config/genesis.json"
-curl -s -f https://cometbft.${env}.fluence.dev/genesis | jq .result.genesis > cometbft/config/genesis.json
+curl -s -f https://cometbft.${network}.fluence.dev/genesis | jq .result.genesis >cometbft/config/genesis.json
 
 generate_env
+generate_basicauth
 
 # check if validator key was already generated
 if [[ -f ./keys/validator.sk ]]; then
@@ -167,14 +187,14 @@ if [[ -f ./keys/validator.sk ]]; then
   if ! [[ -f ./cometbft/data/priv_validator_key_state.json ]]; then
     init_key_state
   fi
-cat <<FINISH
+  cat <<FINISH
 
 Subnet ID is ${subnet_id}
 File with configuration options was regenerated at .env
 
 Please share validator address and public key with Fluence team:
   address: $(cat keys/validator.address)
-  public key: $( cat keys/validator.pk.hex)
+  public key: $(cat keys/validator.pk.hex)
 You can also find them at './keys/validator.address' and './keys/validator.pk.hex'
 FINISH
   exit 0
@@ -184,19 +204,19 @@ echo "Generating fendermint network key"
 docker run --rm --user ${UID} -v ./keys:/keys ${fendermint_image} key gen --out-dir /keys/ --name fendermint
 
 echo "Generating validator key"
-validator_address=$(docker run --rm --user ${UID} -e IPC_NETWORK=${network} -v ./ipc-cli:/ipc ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet new --wallet-type evm | tr -d \")
-validator_public=$(docker run --rm --user ${UID} -e IPC_NETWORK=${network} -v ./ipc-cli:/ipc ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet pub-key --wallet-type evm --address ${validator_address})
-validator_private=$(docker run --rm --user ${UID} -e IPC_NETWORK=${network} -v ./ipc-cli:/ipc -v ./keys:/keys ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet export --wallet-type evm --address ${validator_address} --hex)
-echo $validator_address > ./keys/validator.address
-echo $validator_public > ./keys/validator.pk.hex
-echo $validator_private > ./keys/validator.sk.hex
+validator_address=$(docker run --rm --user ${UID} -e IPC_NETWORK=${fm_network} -v ./ipc-cli:/ipc ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet new --wallet-type evm | tr -d \")
+validator_public=$(docker run --rm --user ${UID} -e IPC_NETWORK=${fm_network} -v ./ipc-cli:/ipc ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet pub-key --wallet-type evm --address ${validator_address})
+validator_private=$(docker run --rm --user ${UID} -e IPC_NETWORK=${fm_network} -v ./ipc-cli:/ipc -v ./keys:/keys ${fendermint_image} ipc-cli --config-path /ipc/config.toml wallet export --wallet-type evm --address ${validator_address} --hex)
+echo $validator_address >./keys/validator.address
+echo $validator_public >./keys/validator.pk.hex
+echo $validator_private >./keys/validator.sk.hex
 init_key_state
 
 echo "Converting validator key to fendermint format"
-docker run --rm --user ${UID} -e FM_NETWORK=${network} -v ./keys:/keys ${fendermint_image} key eth-to-fendermint --secret-key /keys/validator.sk.hex --name validator --out-dir /keys
+docker run --rm --user ${UID} -e FM_NETWORK=${fm_network} -v ./keys:/keys ${fendermint_image} key eth-to-fendermint --secret-key /keys/validator.sk.hex --name validator --out-dir /keys
 
 echo "Converting validator key to cometbft format"
-docker run --rm --user ${UID} -e FM_NETWORK=${network} -v ./keys:/keys ${fendermint_image} key into-tendermint --secret-key /keys/validator.sk --out /keys/priv_validator_key.json
+docker run --rm --user ${UID} -e FM_NETWORK=${fm_network} -v ./keys:/keys ${fendermint_image} key into-tendermint --secret-key /keys/validator.sk --out /keys/priv_validator_key.json
 
 cat <<FINISH
 

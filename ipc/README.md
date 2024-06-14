@@ -5,7 +5,7 @@
 Get IPC parameters, pull genesis file, create keys with one command:
 
 ```shell
-./boostrap.sh --env ENV --name NAME --ip IP
+./boostrap.sh --network NETWORK --name NAME --ip IP
 ```
 
 See `./boostrap.sh -h` for more info.
@@ -20,6 +20,15 @@ See `./boostrap.sh -h` for more info.
 
 ```shell
 docker compose up -d
+```
+
+## Run with observabiliy stack
+
+In order to run observability stack you should get basic auth from Cloudless labs.
+
+```shell
+./boostrap.sh --network NETWORK --name NAME --ip IP --basicauth_username USERNAME --basicauth_password PASSWORD
+docker compose --profile observability up -d
 ```
 
 ## Cleanup
@@ -61,5 +70,6 @@ from previous deployment will be reused.
 │   ├── validator.pk.hex        # validator publick key in hex format
 │   ├── validator.sk            # validator secret key
 │   └── validator.sk.hex        # validator secret key in hex format
+├── observability               # config files for observability services
 └── README.md
 ```

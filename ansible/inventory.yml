@@ -20,3 +20,12 @@ all:
         # fluence_promtail_version: "2.9.5"
         # fluence_prometheus_version: "2.52.0"
         # fluence_network: "kras" # or "dar"
+        vm_name: sandbox
+        vm_image_s3_bucket: your-s3-bucket-name
+        vm_image_s3_key: path/to/your/vm-image.qcow2
+        vm_image_local_path: /var/lib/libvirt/images/{{ vm_name }}.qcow2
+        bridge_name: br422442
+        vm_mac: "{{ '52:54:00' | community.general.random_mac(seed=inventory_hostname) }}"
+        vm_uuid: "{{ '123' | to_uuid }}"
+        physical_iface: "dummy0"  # Physical network interface to be added to the bridge
+        vm_ram: 1048576  # RAM size in KiB (1 GiB)

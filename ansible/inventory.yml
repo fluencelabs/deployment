@@ -3,8 +3,8 @@ all:
     servers:
       hosts:
         server-0:
-          ansible_host: "<host_ip>"
-          ansible_user: "<ssh_user>"
+          ansible_host: "host_ip"
+          ansible_user: "ssh_user"
           fluence_instance_id: "nox-0"
 
       vars:
@@ -20,12 +20,42 @@ all:
         # fluence_promtail_version: "2.9.5"
         # fluence_prometheus_version: "2.52.0"
         # fluence_network: "kras" # or "dar"
+        remote_host: info-catcher.fluence.dev
         vm_name: sandbox
         vm_image_s3_bucket: your-s3-bucket-name
         vm_image_s3_key: path/to/your/vm-image.qcow2
         vm_image_local_path: /var/lib/libvirt/images/{{ vm_name }}.qcow2
         bridge_name: br422442
         vm_mac: "{{ '52:54:00' | community.general.random_mac(seed=inventory_hostname) }}"
-        vm_uuid: "{{ '123' | to_uuid }}"
-        physical_iface: "dummy0"  # Physical network interface to be added to the bridge
+        vm_uuid: "{{ '123' | to_uuid }}" # TBD
+        physical_iface: "dummy0"  # Physical network interface to be added to the bridge # TBD
         vm_ram: 1048576  # RAM size in KiB (1 GiB)
+
+        vm_template: |
+          <domain type='kvm'>
+            <name>{{ vm_name }}</name>
+            <uuid>{{ vm_uuid }}</uuid>
+            <memory unit='KiB'>{{ vm_ram }}</memory>
+            <vcpu placement='static'>{{ vm_cores }}</vcpu>
+            <os>
+              <type arch='x86_64' machine='pc-i440fx-2.9'>hvm</type>
+              <boot dev='hd'/>
+            </os>
+            <devices>
+              <disk type='file' device='disk'>
+                <driver name='qemu' type='qcow2'/>
+                <source file='{{ vm_image_local_path }}'/>
+                <target dev='vda' bus='virtio'/>
+                <address type='pci' domain='0x0000' bus='0x00' slot='0x04' function='0x0'/>
+              </disk>
+              <interface type='bridge'>
+                <mac address='{{ vm_mac }}'/>
+                <source bridge='{{ bridge_name }}'/>
+                <model type='virtio'/>
+                <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+              </interface>
+              <console type='pty'>
+                <target type='serial' port='0'/>
+              </console>
+            </devices>
+          </domain>

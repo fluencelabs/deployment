@@ -12,7 +12,7 @@
 
     - name: Set vm_cores to the number of logical cores
       set_fact:
-        vm_cores: "{{ ansible_processor_vcpus - 4 }}" # TBD check that ansible_processor_vcpus is an int
+        vm_cores: "{{ ansible_processor_vcpus - 4 }}"
 
     - name: Install libvirt on Debian-based systems
       apt:
@@ -37,9 +37,18 @@
       args:
         creates: /sys/class/net/{{ bridge_name }}
 
-    - name: Add physical interface to the bridge
+    - name: Check if physical interface is part of the bridge
+      command: brctl show {{ bridge_name }}
+      register: bridge_output
+      changed_when: false
+
+    - name: Set fact if physical interface is not in bridge
+      set_fact:
+        iface_not_in_bridge: "{{ physical_iface not in bridge_output.stdout }}"
+
+    - name: Add physical interface to the bridge if not already added
       command: brctl addif {{ bridge_name }} {{ physical_iface }}
-      when: "physical_iface in ansible_facts.interfaces"
+      when: iface_not_in_bridge
       ignore_errors: yes
 
     - name: Bring up the bridge interface
@@ -49,13 +58,13 @@
     - name: Bring up the physical interface
       command: ip link set {{ physical_iface }} up
 
-    - name: Download VM image from S3
-      amazon.aws.aws_s3:
-        bucket: "{{ s3_bucket }}"
-        object: "{{ s3_key }}"
-        dest: "{{ vm_image_path }}"
-        mode: get
-      ignore_errors: yes # TBD remove when image becomes available
+    - name: Download VM image
+      get_url:
+        url: "{{ vm_image_url }}"
+        dest: "{{ vm_image_local_path }}"
+        mode: '0644'
+        owner: "{{ libvirt_user }}"
+        group: "{{ libvirt_group }}"
 
     - name: Ensure a simple VM is defined
       community.libvirt.virt:

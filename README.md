@@ -17,17 +17,20 @@ source ~/.fluence/venvs/ansible/bin/activate
 ### Install Python Dependencies
 
 ```
+cd ansible
 pip3 install -r requirements.txt
 ```
 
 ### Intall Ansible dependencies
 
 ```
+# in 'ansible' directory
 ansible-galaxy collection install fluencelabs.provider --force
 ```
 
 ### Run the playbook
 
 ```
+# in 'ansible' directory
 ansible-playbook nox.yml -i inventory.yml
 ```

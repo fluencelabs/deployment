@@ -9,14 +9,21 @@ all:
 
       vars:
         # Need to be set according to the required version for the following components.
-        nox_version: "0.24.0"
+        nox_version: "0.26.2"
         ipfs_cli_version: "0.26.0"
-        ccp_version: "0.11.0"
+        ccp_version: "0.13.0"
         # Need to be set according to project name inside files directory
         fluence_project_dir: "<fluence_project_dir>"
+
+        # Select the network, kras = mainnet, dar = testnet
+        # fluence_network: "kras" # or "dar"
+
         # Set only if you want to ship logs/metrics to Cloudless labs
         # fluence_basicauth_username: "<username>"
         # fluence_basicauth_password: "<password>"
         # fluence_promtail_version: "2.9.5"
         # fluence_prometheus_version: "2.52.0"
-        # fluence_network: "kras" # or "dar"
+
+        # To clean up the state, uncomment these
+        # nox_cleanup_state: true
+        # ccp_cleanup_state: true

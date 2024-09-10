@@ -9,7 +9,7 @@ all:
 
       vars:
         # Need to be set according to the required version for the following components.
-        nox_version: "0.27.0"
+        nox_version: "0.27.1"
         ipfs_cli_version: "0.26.0"
         ccp_version: "0.13.0"
         # Need to be set according to project name inside files directory

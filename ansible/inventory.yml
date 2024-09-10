@@ -23,7 +23,3 @@ all:
         # fluence_basicauth_password: "<password>"
         # fluence_promtail_version: "2.9.5"
         # fluence_prometheus_version: "2.52.0"
-
-        # To clean up the state, uncomment these
-        # nox_cleanup_state: true
-        # ccp_cleanup_state: true

@@ -9,7 +9,7 @@ all:
 
       vars:
         # Need to be set according to the required version for the following components.
-        nox_version: "0.27.1"
+        nox_version: "0.27.9"
         ipfs_cli_version: "0.26.0"
         ccp_version: "0.13.2"
         # Need to be set according to project name inside files directory
@@ -23,3 +23,8 @@ all:
         # fluence_basicauth_password: "<password>"
         # fluence_promtail_version: "2.9.5"
         # fluence_prometheus_version: "2.52.0"
+
+        # To clean up the state, uncomment these
+        # Don't forget to comment afterwards
+        # nox_cleanup_state: true
+        # ccp_cleanup_state: true
